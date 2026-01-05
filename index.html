@@ -43,13 +43,45 @@
         }
         
         .controls {
-            display: flex;
-            gap: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
             margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .filter-group {
+            margin-bottom: 15px;
+        }
+        
+        .filter-label {
+            display: block;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            background: white;
+            color: #2d3748;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
         button {
-            flex: 1;
+            width: 100%;
             padding: 15px;
             border: none;
             border-radius: 10px;
@@ -65,7 +97,7 @@
             color: white;
         }
         
-        .scan-btn:hover {
+        .scan-btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
@@ -104,6 +136,13 @@
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .results-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
         }
         
         .coin-card {
@@ -216,6 +255,18 @@
         </div>
         
         <div class="controls">
+            <div class="filter-group">
+                <label class="filter-label">📏 Maksimum Mesafe Filtresi</label>
+                <select id="distanceFilter">
+                    <option value="0.5">%0.5 - Çok Hassas</option>
+                    <option value="1.0" selected>%1.0 - Hassas</option>
+                    <option value="2.0">%2.0 - Normal</option>
+                    <option value="3.0">%3.0 - Geniş</option>
+                    <option value="5.0">%5.0 - Çok Geniş</option>
+                    <option value="10.0">%10.0 - Tüm Sonuçlar</option>
+                </select>
+            </div>
+            
             <button class="scan-btn" onclick="scanCoins()">
                 📊 Tarama Başlat
             </button>
@@ -227,7 +278,7 @@
             <strong>ℹ️ Nasıl Çalışır:</strong><br>
             • Son Cuma günü Asya seansı (19:00-23:59 NY) wick high/low hesaplanır<br>
             • %50 Fibonacci: (WickHigh + WickLow) / 2<br>
-            • Mevcut fiyata en yakın Top 10 coin listelenir<br>
+            • Seçtiğiniz mesafe içindeki coinler listelenir (en yakından uzağa)<br>
             • Yeşil: Fiyat fib üstünde | Kırmızı: Fiyat fib altında
         </div>
     </div>
@@ -240,6 +291,7 @@
         async function scanCoins() {
             const content = document.getElementById('content');
             const btn = document.querySelector('.scan-btn');
+            const filterValue = parseFloat(document.getElementById('distanceFilter').value);
             
             btn.disabled = true;
             btn.textContent = '⏳ Taranıyor...';
@@ -257,7 +309,7 @@
                 const tickers = await tickersResponse.json();
                 
                 const usdtPairs = tickers
-                    .filter(t => t.symbol.endsWith('USDT') && !t.symbol.includes('UP') && !t.symbol.includes('DOWN'))
+                    .filter(t => t.symbol.endsWith('USDT') && !t.symbol.includes('UP') && !t.symbol.includes('DOWN') && !t.symbol.includes('BEAR') && !t.symbol.includes('BULL'))
                     .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume))
                     .slice(0, TOP_COINS_COUNT)
                     .map(t => t.symbol);
@@ -267,7 +319,7 @@
                 // 2. Get last Friday's date
                 const lastFriday = getLastFriday();
                 const startTime = new Date(lastFriday);
-                startTime.setUTCHours(23, 0, 0, 0); // 19:00 NY = 23:00 UTC (DST'ye göre 00:00 olabilir)
+                startTime.setUTCHours(23, 0, 0, 0); // 19:00 NY = 23:00 UTC
                 
                 const endTime = new Date(lastFriday);
                 endTime.setUTCHours(3, 59, 0, 0); // 23:59 NY = 03:59 UTC next day
@@ -282,7 +334,7 @@
                         content.innerHTML = `
                             <div class="loading">
                                 <div class="spinner"></div>
-                                <p>İşleniyor: ${i}/${usdtPairs.length}</p>
+                                <p>İşleniyor: ${i}/${usdtPairs.length}<br>Filtre: %${filterValue}</p>
                             </div>
                         `;
                     }
@@ -338,12 +390,17 @@
                     }
                 }
                 
-                // 4. Sort by distance and get top 10
+                // 4. Sort by distance and filter
                 results.sort((a, b) => a.distancePercent - b.distancePercent);
-                const top10 = results.slice(0, DISPLAY_COUNT);
+                
+                // Apply distance filter
+                const filtered = results.filter(r => r.distancePercent <= filterValue);
+                
+                // Get top 10
+                const top10 = filtered.slice(0, DISPLAY_COUNT);
                 
                 // 5. Display results
-                displayResults(top10);
+                displayResults(top10, filterValue, filtered.length);
                 
             } catch (error) {
                 content.innerHTML = `
@@ -359,16 +416,24 @@
             }
         }
         
-        function displayResults(coins) {
+        function displayResults(coins, filterValue, totalMatches) {
             const content = document.getElementById('content');
             
             if (coins.length === 0) {
-                content.innerHTML = '<div class="error">Sonuç bulunamadı.</div>';
+                content.innerHTML = `
+                    <div class="error">
+                        ❌ %${filterValue} mesafe içinde sonuç bulunamadı.<br>
+                        Daha geniş bir filtre seçmeyi deneyin.
+                    </div>
+                `;
                 return;
             }
             
             const html = `
                 <div class="results">
+                    <div class="results-header">
+                        📊 ${totalMatches} coin eşleşti | En yakın ${coins.length} gösteriliyor
+                    </div>
                     ${coins.map((coin, index) => `
                         <div class="coin-card">
                             <div class="coin-header">
@@ -378,19 +443,19 @@
                             <div class="coin-data">
                                 <div class="data-item">
                                     <span class="data-label">Fiyat</span>
-                                    <span class="data-value">$${coin.currentPrice.toFixed(8)}</span>
+                                    <span class="data-value">$${formatPrice(coin.currentPrice)}</span>
                                 </div>
                                 <div class="data-item">
                                     <span class="data-label">Fib %50</span>
-                                    <span class="data-value">$${coin.fib50.toFixed(8)}</span>
+                                    <span class="data-value">$${formatPrice(coin.fib50)}</span>
                                 </div>
                                 <div class="data-item">
                                     <span class="data-label">Wick High</span>
-                                    <span class="data-value">$${coin.wickHigh.toFixed(8)}</span>
+                                    <span class="data-value">$${formatPrice(coin.wickHigh)}</span>
                                 </div>
                                 <div class="data-item">
                                     <span class="data-label">Wick Low</span>
-                                    <span class="data-value">$${coin.wickLow.toFixed(8)}</span>
+                                    <span class="data-value">$${formatPrice(coin.wickLow)}</span>
                                 </div>
                             </div>
                             <div style="margin-top: 10px; text-align: center;">
@@ -407,10 +472,20 @@
             content.innerHTML = html;
         }
         
+        function formatPrice(price) {
+            if (price >= 1) {
+                return price.toFixed(4);
+            } else if (price >= 0.01) {
+                return price.toFixed(6);
+            } else {
+                return price.toFixed(8);
+            }
+        }
+        
         function getLastFriday() {
             const today = new Date();
             const dayOfWeek = today.getUTCDay();
-            const daysToFriday = (dayOfWeek + 2) % 7; // Days since last Friday
+            const daysToFriday = (dayOfWeek + 2) % 7;
             const lastFriday = new Date(today);
             lastFriday.setUTCDate(today.getUTCDate() - daysToFriday);
             lastFriday.setUTCHours(0, 0, 0, 0);
