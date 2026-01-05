@@ -1057,7 +1057,7 @@
             ]);
 
             let csv = headers.join(',') + '\n';
-            csv += rows.map(row => row.join(','')).join('\n');
+            csv += rows.map(row => row.join(',')).join('\n');
 
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
