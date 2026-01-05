@@ -574,7 +574,7 @@
             <div class="header-content">
                 <div>
                     <h1>🎯 Asian Range Fib50 Scanner</h1>
-                    <div class="header-subtitle">Professional Trading Dashboard - Real-time Market Analysis</div>
+                    <div class="header-subtitle">Professional Trading Dashboard - Real-time Market Analysis (OPTIMIZED ⚡)</div>
                 </div>
                 <button class="theme-toggle" onclick="toggleTheme()">
                     <span id="theme-icon">🌙</span> Toggle Theme
@@ -696,6 +696,13 @@
         let currentFilter = 'all';
         let sortColumn = 'distance';
         let sortDirection = 'asc';
+        
+        // Configuration
+        const CONFIG = {
+            BATCH_SIZE: 10,           // Process 10 symbols in parallel
+            BATCH_DELAY: 100,         // Delay between batches (ms)
+            MIN_VOLUME_FILTER: 0      // Pre-filter by volume (0 = no filter)
+        };
 
         // Theme Management
         function toggleTheme() {
@@ -714,7 +721,7 @@
             document.getElementById('theme-icon').textContent = savedTheme === 'dark' ? '🌙' : '☀️';
         });
 
-        // Binance API Functions
+        // Binance API Functions with retry logic
         async function fetchBinanceData(url, retries = 3) {
             for (let i = 0; i < retries; i++) {
                 try {
@@ -753,33 +760,32 @@
             return { startTime, endTime };
         }
 
-        // CORRECTED: Calculate Asian Range and Fib50
+        // Calculate Asian Range and Fib50
         function calculateAsianRangeFib50(klines) {
             if (!klines || klines.length === 0) {
                 return { fib50: null, ar_wickHigh: null, ar_wickLow: null };
             }
 
             // Initialize with first candle's values
-            let ar_wickHigh = parseFloat(klines[0][2]); // First candle's high
-            let ar_wickLow = parseFloat(klines[0][3]);  // First candle's low
+            let ar_wickHigh = parseFloat(klines[0][2]);
+            let ar_wickLow = parseFloat(klines[0][3]);
 
-            // Iterate through all candles and update incrementally
-            for (let i = 0; i < klines.length; i++) {
+            // Find the highest high and lowest low
+            for (let i = 1; i < klines.length; i++) {
                 const high = parseFloat(klines[i][2]);
                 const low = parseFloat(klines[i][3]);
                 
-                // Update incrementally
                 ar_wickHigh = Math.max(high, ar_wickHigh);
                 ar_wickLow = Math.min(low, ar_wickLow);
             }
 
-            // Calculate Fib50
+            // Calculate Fib50 (midpoint)
             const fib50 = (ar_wickHigh + ar_wickLow) / 2;
 
             return { fib50, ar_wickHigh, ar_wickLow };
         }
 
-        // Scan Market
+        // OPTIMIZED: Scan Market with Parallel Processing
         async function scanMarket() {
             const scanBtn = document.getElementById('scanBtn');
             const exportBtn = document.getElementById('exportBtn');
@@ -797,88 +803,124 @@
             errorMessage.classList.remove('active');
             allResults = [];
 
+            const startScanTime = Date.now();
+
             try {
                 // Get Asian session time range
                 const { startTime, endTime } = getAsianSessionTimeRange();
                 
                 // Debug info
-                let debugText = `Asian Session Time Range:\n`;
+                let debugText = `⚡ OPTIMIZED SCAN MODE ⚡\n\n`;
+                debugText += `Asian Session Time Range:\n`;
                 debugText += `Start: ${new Date(startTime).toLocaleString('en-US', {timeZone: 'America/New_York'})} NY\n`;
                 debugText += `End: ${new Date(endTime).toLocaleString('en-US', {timeZone: 'America/New_York'})} NY\n`;
                 debugText += `Duration: ${((endTime - startTime) / (1000 * 60 * 60)).toFixed(2)} hours\n\n`;
-
-                // Fetch all USDT pairs
-                const exchangeInfo = await fetchBinanceData('https://api.binance.com/api/v3/exchangeInfo');
-                const usdtPairs = exchangeInfo.symbols
-                    .filter(s => s.symbol.endsWith('USDT') && s.status === 'TRADING')
-                    .map(s => s.symbol);
-
-                debugText += `Total USDT Pairs: ${usdtPairs.length}\n\n`;
 
                 // Show progress
                 progressContainer.classList.add('active');
                 loadingState.classList.remove('active');
 
+                // STEP 1: Get all tickers in ONE request (HUGE speedup!)
+                debugText += `⚡ Fetching all tickers in one request...\n`;
+                document.getElementById('debugInfo').textContent = debugText;
+                
+                const allTickers = await fetchBinanceData('https://api.binance.com/api/v3/ticker/24hr');
+                
+                // Filter USDT pairs with volume
+                const usdtTickers = allTickers.filter(t => 
+                    t.symbol.endsWith('USDT') && 
+                    parseFloat(t.quoteVolume) > CONFIG.MIN_VOLUME_FILTER
+                );
+
+                debugText += `Total USDT Pairs: ${usdtTickers.length}\n`;
+                debugText += `Batch Size: ${CONFIG.BATCH_SIZE} parallel requests\n\n`;
+
+                // Create ticker map for fast lookup
+                const tickerMap = new Map();
+                usdtTickers.forEach(t => {
+                    tickerMap.set(t.symbol, {
+                        price: parseFloat(t.lastPrice),
+                        volume: parseFloat(t.quoteVolume) / 1000000
+                    });
+                });
+
+                // STEP 2: Process klines in parallel batches
+                const symbols = Array.from(tickerMap.keys());
                 const results = [];
                 let processed = 0;
 
-                // Process in batches
-                for (const symbol of usdtPairs) {
-                    try {
-                        // Get current price
-                        const ticker = await fetchBinanceData(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
-                        const currentPrice = parseFloat(ticker.lastPrice);
-                        const volume = parseFloat(ticker.quoteVolume) / 1000000; // Convert to millions
+                debugText += `Processing ${symbols.length} symbols...\n\n`;
+                document.getElementById('debugInfo').textContent = debugText;
 
-                        // Get klines for Asian session
-                        const klinesUrl = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=15m&startTime=${startTime}&endTime=${endTime}&limit=1000`;
-                        const klines = await fetchBinanceData(klinesUrl);
+                // Process in batches to avoid overwhelming the API
+                for (let i = 0; i < symbols.length; i += CONFIG.BATCH_SIZE) {
+                    const batch = symbols.slice(i, i + CONFIG.BATCH_SIZE);
+                    
+                    // Parallel requests for this batch
+                    const batchPromises = batch.map(async (symbol) => {
+                        try {
+                            const klinesUrl = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=15m&startTime=${startTime}&endTime=${endTime}&limit=1000`;
+                            const klines = await fetchBinanceData(klinesUrl);
 
-                        if (klines && klines.length > 0) {
-                            // Calculate Asian Range Fib50
-                            const { fib50, ar_wickHigh, ar_wickLow } = calculateAsianRangeFib50(klines);
+                            if (klines && klines.length > 0) {
+                                const { fib50, ar_wickHigh, ar_wickLow } = calculateAsianRangeFib50(klines);
 
-                            if (fib50) {
-                                const distance = Math.abs(((currentPrice - fib50) / fib50) * 100);
+                                if (fib50) {
+                                    const ticker = tickerMap.get(symbol);
+                                    const distance = Math.abs(((ticker.price - fib50) / fib50) * 100);
 
-                                results.push({
-                                    symbol,
-                                    currentPrice,
-                                    fib50,
-                                    arWickHigh: ar_wickHigh,
-                                    arWickLow: ar_wickLow,
-                                    distance,
-                                    volume,
-                                    klineCount: klines.length
-                                });
-
-                                // Add BTC analysis to debug
-                                if (symbol === 'BTCUSDT') {
-                                    debugText += `BTC Analysis:\n`;
-                                    debugText += `Current Price: $${currentPrice.toFixed(2)}\n`;
-                                    debugText += `AR Wick High: $${ar_wickHigh.toFixed(2)}\n`;
-                                    debugText += `AR Wick Low: $${ar_wickLow.toFixed(2)}\n`;
-                                    debugText += `Fib50: $${fib50.toFixed(2)}\n`;
-                                    debugText += `Distance: ${distance.toFixed(2)}%\n`;
-                                    debugText += `Candles: ${klines.length}\n`;
+                                    return {
+                                        symbol,
+                                        currentPrice: ticker.price,
+                                        fib50,
+                                        arWickHigh: ar_wickHigh,
+                                        arWickLow: ar_wickLow,
+                                        distance,
+                                        volume: ticker.volume,
+                                        klineCount: klines.length
+                                    };
                                 }
                             }
+                        } catch (error) {
+                            console.error(`Error processing ${symbol}:`, error);
                         }
+                        return null;
+                    });
 
-                        // Update progress
-                        processed++;
-                        const percentage = Math.round((processed / usdtPairs.length) * 100);
-                        document.getElementById('progressText').textContent = `Processing ${processed}/${usdtPairs.length} coins...`;
-                        document.getElementById('progressFill').style.width = `${percentage}%`;
-                        document.getElementById('progressFill').textContent = `${percentage}%`;
+                    // Wait for batch to complete
+                    const batchResults = await Promise.all(batchPromises);
+                    results.push(...batchResults.filter(r => r !== null));
 
-                        // Rate limiting
-                        await new Promise(resolve => setTimeout(resolve, 150));
+                    // Update progress
+                    processed += batch.length;
+                    const percentage = Math.round((processed / symbols.length) * 100);
+                    document.getElementById('progressText').textContent = `Processing ${processed}/${symbols.length} coins...`;
+                    document.getElementById('progressFill').style.width = `${percentage}%`;
+                    document.getElementById('progressFill').textContent = `${percentage}%`;
 
-                    } catch (error) {
-                        console.error(`Error processing ${symbol}:`, error);
+                    // Small delay between batches to respect rate limits
+                    if (i + CONFIG.BATCH_SIZE < symbols.length) {
+                        await new Promise(resolve => setTimeout(resolve, CONFIG.BATCH_DELAY));
                     }
                 }
+
+                // Calculate scan time
+                const scanDuration = ((Date.now() - startScanTime) / 1000).toFixed(1);
+
+                // Add BTC analysis to debug
+                const btcResult = results.find(r => r.symbol === 'BTCUSDT');
+                if (btcResult) {
+                    debugText += `BTC Analysis:\n`;
+                    debugText += `Current Price: ${btcResult.currentPrice.toFixed(2)}\n`;
+                    debugText += `AR Wick High: ${btcResult.arWickHigh.toFixed(2)}\n`;
+                    debugText += `AR Wick Low: ${btcResult.arWickLow.toFixed(2)}\n`;
+                    debugText += `Fib50: ${btcResult.fib50.toFixed(2)}\n`;
+                    debugText += `Distance: ${btcResult.distance.toFixed(2)}%\n`;
+                    debugText += `Candles: ${btcResult.klineCount}\n\n`;
+                }
+
+                debugText += `✅ Scan completed in ${scanDuration} seconds\n`;
+                debugText += `📊 Found ${results.length} valid pairs\n`;
 
                 allResults = results;
                 
@@ -1009,10 +1051,10 @@
                 return `
                     <tr>
                         <td class="symbol-cell">${baseSymbol}</td>
-                        <td>$${r.currentPrice.toFixed(8)}</td>
-                        <td>$${r.fib50.toFixed(8)}</td>
-                        <td>$${r.arWickHigh.toFixed(8)}</td>
-                        <td>$${r.arWickLow.toFixed(8)}</td>
+                        <td>${r.currentPrice.toFixed(8)}</td>
+                        <td>${r.fib50.toFixed(8)}</td>
+                        <td>${r.arWickHigh.toFixed(8)}</td>
+                        <td>${r.arWickLow.toFixed(8)}</td>
                         <td><span class="distance-badge ${distanceClass}">${r.distance.toFixed(2)}%</span></td>
                         <td>${r.volume.toFixed(2)}M</td>
                         <td><a href="${tvLink}" target="_blank" class="chart-link">📈 View</a></td>
