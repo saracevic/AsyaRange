@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asian Range Fibonacci 50% Scanner</title>
+    <title>Asian Range Fibonacci 50%</title>
     <style>
         * {
             margin: 0;
@@ -11,494 +11,244 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --bg-primary: #0f0f23;
-            --bg-secondary: #1a1a2e;
-            --bg-tertiary: #16213e;
-            --text-primary: #e4e4e7;
-            --text-secondary: #a1a1aa;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --border: #27272a;
-        }
-
-        body.light-mode {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f9fafb;
-            --bg-tertiary: #f3f4f6;
-            --text-primary: #18181b;
-            --text-secondary: #52525b;
-            --border: #e5e7eb;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            transition: background 0.3s, color 0.3s;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
-        }
-
-        header {
-            background: var(--bg-secondary);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, var(--accent), var(--success));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 14px;
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
         .controls {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            align-items: center;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .control-group {
             margin-bottom: 20px;
-            background: var(--bg-secondary);
-            padding: 20px;
-            border-radius: 12px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         button {
-            background: var(--accent);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
             font-weight: 600;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-top: 10px;
         }
 
         button:hover {
-            background: var(--accent-hover);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        button:disabled {
-            background: var(--text-secondary);
-            cursor: not-allowed;
-            transform: none;
+        button:active {
+            transform: translateY(0);
         }
 
-        input, select {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .filter-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .filter-group label {
-            font-size: 14px;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        #status {
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            display: none;
-            margin-bottom: 20px;
-        }
-
-        #status.show {
-            display: block;
-        }
-
-        #status.info {
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--accent);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-        }
-
-        #status.success {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        #status.error {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .stats {
+        #results {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
 
-        .stat-card {
-            background: var(--bg-secondary);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
+        .result-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
         }
 
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
+        .result-card:hover {
+            transform: translateY(-5px);
         }
 
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        thead {
-            background: var(--bg-tertiary);
-        }
-
-        th {
-            padding: 16px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            user-select: none;
-            transition: background 0.3s;
-        }
-
-        th:hover {
-            background: var(--bg-primary);
-        }
-
-        th.sortable::after {
-            content: ' ⇅';
-            opacity: 0.3;
-        }
-
-        th.sorted-asc::after {
-            content: ' ↑';
-            opacity: 1;
-        }
-
-        th.sorted-desc::after {
-            content: ' ↓';
-            opacity: 1;
-        }
-
-        td {
-            padding: 16px;
-            border-top: 1px solid var(--border);
-            font-size: 14px;
-        }
-
-        tr:hover {
-            background: var(--bg-tertiary);
-        }
-
-        .symbol {
-            font-weight: 600;
-            color: var(--accent);
-        }
-
-        .distance {
-            font-weight: 600;
-        }
-
-        .distance.close {
-            color: var(--success);
-        }
-
-        .distance.medium {
-            color: var(--warning);
-        }
-
-        .distance.far {
-            color: var(--danger);
-        }
-
-        .theme-toggle {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-        }
-
-        .theme-toggle:hover {
-            background: var(--bg-primary);
-            transform: translateY(-2px);
-        }
-
-        .debug-panel {
-            background: var(--bg-secondary);
-            padding: 20px;
-            border-radius: 12px;
-            margin-top: 20px;
-            border: 1px solid var(--border);
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .debug-title {
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: var(--accent);
-            font-size: 14px;
-        }
-
-        .debug-section {
+        .symbol-name {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
             margin-bottom: 15px;
-            padding: 10px;
-            background: var(--bg-tertiary);
-            border-radius: 6px;
+            text-align: center;
         }
 
-        .debug-label {
-            color: var(--text-secondary);
+        .fib-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #764ba2;
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 10px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #666;
             font-weight: 600;
         }
 
-        .chart-link {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s;
+        .detail-value {
+            color: #333;
+            font-weight: bold;
         }
 
-        .chart-link:hover {
-            color: var(--accent-hover);
-            text-decoration: underline;
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.5em;
         }
 
-        .export-btn {
-            background: var(--success);
+        .error {
+            background: #ff4757;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
         }
 
-        .export-btn:hover {
-            background: #059669;
+        .info-box {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-box p {
+            margin: 5px 0;
+            color: #333;
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
+            h1 {
+                font-size: 1.8em;
             }
 
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
+            .result-card {
+                padding: 20px;
             }
 
-            button {
-                justify-content: center;
+            .fib-value {
+                font-size: 2em;
             }
-
-            table {
-                font-size: 12px;
-            }
-
-            th, td {
-                padding: 8px;
-            }
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🎯 Asian Range Fibonacci 50% Scanner</h1>
-            <p class="subtitle">Real-time analysis of crypto pairs' distance from Asian Range Fib 50% level</p>
-        </header>
-
+        <h1>📊 Asian Range Fibonacci 50%</h1>
+        
         <div class="controls">
-            <button id="scanBtn" onclick="startScan()">
-                <span>🔍</span>
-                <span>Start Scan</span>
-            </button>
-            <button class="export-btn" onclick="exportToCSV()" id="exportBtn" disabled>
-                <span>📥</span>
-                <span>Export CSV</span>
-            </button>
-            <button class="theme-toggle" onclick="toggleTheme()">
-                <span id="themeIcon">🌙</span>
-                <span>Toggle Theme</span>
-            </button>
-
-            <div class="filter-group">
-                <label for="searchInput">Search:</label>
-                <input type="text" id="searchInput" placeholder="Symbol..." oninput="filterResults()">
+            <div class="info-box">
+                <p><strong>Asian Session Range:</strong> Friday 17:00 UTC to Monday 00:00 UTC</p>
+                <p><strong>Fibonacci 50%:</strong> (High + Low) / 2</p>
             </div>
 
-            <div class="filter-group">
-                <label for="distanceFilter">Max Distance:</label>
-                <select id="distanceFilter" onchange="filterResults()">
-                    <option value="100">All</option>
-                    <option value="1">≤ 1%</option>
-                    <option value="2">≤ 2%</option>
-                    <option value="5" selected>≤ 5%</option>
-                    <option value="10">≤ 10%</option>
-                </select>
+            <div class="control-group">
+                <label for="symbols">Trading Symbols (comma separated):</label>
+                <input type="text" id="symbols" placeholder="BTCUSDT, ETHUSDT, BNBUSDT" value="BTCUSDT, ETHUSDT, BNBUSDT, SOLUSDT, XRPUSDT">
             </div>
 
-            <div class="filter-group">
-                <label for="minVolume">Min Volume (M):</label>
-                <input type="number" id="minVolume" value="0" min="0" step="1" onchange="filterResults()" style="width: 100px;">
+            <div class="control-group">
+                <label for="startDate">Start Date (Friday 17:00 UTC):</label>
+                <input type="datetime-local" id="startDate">
             </div>
+
+            <div class="control-group">
+                <label for="endDate">End Date (Monday 00:00 UTC):</label>
+                <input type="datetime-local" id="endDate">
+            </div>
+
+            <button onclick="calculateAll()">🚀 Calculate Fibonacci 50%</button>
         </div>
 
-        <div id="status"></div>
-
-        <div class="stats" id="stats" style="display: none;">
-            <div class="stat-card">
-                <div class="stat-label">Total Pairs Scanned</div>
-                <div class="stat-value" id="totalPairs">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Within 5%</div>
-                <div class="stat-value" id="within5">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Avg Distance</div>
-                <div class="stat-value" id="avgDistance">0%</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Closest Pair</div>
-                <div class="stat-value" id="closestPair">-</div>
-            </div>
-        </div>
-
-        <div style="overflow-x: auto;">
-            <table id="resultsTable" style="display: none;">
-                <thead>
-                    <tr>
-                        <th class="sortable" onclick="sortTable(0)">Symbol</th>
-                        <th class="sortable" onclick="sortTable(1)">Current Price</th>
-                        <th class="sortable" onclick="sortTable(2)">Fib50</th>
-                        <th class="sortable" onclick="sortTable(3)">Wick High</th>
-                        <th class="sortable" onclick="sortTable(4)">Wick Low</th>
-                        <th class="sortable" onclick="sortTable(5)">Distance (%)</th>
-                        <th class="sortable" onclick="sortTable(6)">Volume (M)</th>
-                        <th>Chart</th>
-                    </tr>
-                </thead>
-                <tbody id="resultsBody"></tbody>
-            </table>
-        </div>
-
-        <div class="debug-panel" id="debugPanel" style="display: none;">
-            <div class="debug-title">📊 Debug Information</div>
-            <div id="debugContent"></div>
-        </div>
+        <div id="results"></div>
     </div>
 
     <script>
-        let scanResults = [];
-        let allResults = [];
-        let sortColumn = 5;
-        let sortAscending = true;
-
-        // Get last Friday's date
-        function getLastFriday() {
+        // Set default dates (last Friday 17:00 to Monday 00:00)
+        function setDefaultDates() {
             const now = new Date();
             const dayOfWeek = now.getUTCDay();
-            const daysToSubtract = dayOfWeek >= 5 ? dayOfWeek - 5 : dayOfWeek + 2;
+            
+            // Find last Friday
+            let daysToFriday = (dayOfWeek + 2) % 7;
+            if (daysToFriday === 0) daysToFriday = 7;
+            
             const lastFriday = new Date(now);
-            lastFriday.setUTCDate(now.getUTCDate() - daysToSubtract);
-            lastFriday.setUTCHours(0, 0, 0, 0);
-            return lastFriday;
+            lastFriday.setUTCDate(now.getUTCDate() - daysToFriday);
+            lastFriday.setUTCHours(17, 0, 0, 0);
+            
+            // Find following Monday
+            const nextMonday = new Date(lastFriday);
+            nextMonday.setUTCDate(lastFriday.getUTCDate() + 3);
+            nextMonday.setUTCHours(0, 0, 0, 0);
+            
+            // Format for datetime-local input
+            document.getElementById('startDate').value = formatDateForInput(lastFriday);
+            document.getElementById('endDate').value = formatDateForInput(nextMonday);
         }
 
-        // Get Asian session times (Friday 19:00-23:59 NY time = Friday 23:00 UTC to Saturday 03:59 UTC)
-        function getAsianSessionTimes() {
-            const lastFriday = getLastFriday();
-            
-            // Start: Friday 23:00 UTC (19:00 NY time)
-            const startTime = new Date(lastFriday);
-            startTime.setUTCHours(23, 0, 0, 0);
-            
-            // End: Saturday 03:59 UTC (23:59 NY time Friday)
-            const endTime = new Date(lastFriday);
-            endTime.setUTCDate(lastFriday.getUTCDate() + 1);
-            endTime.setUTCHours(3, 59, 59, 999);
-            
-            return {
-                startTime: startTime.getTime(),
-                endTime: endTime.getTime(),
-                startDate: startTime,
-                endDate: endTime
-            };
+        function formatDateForInput(date) {
+            const year = date.getUTCFullYear();
+            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(date.getUTCDate()).padStart(2, '0');
+            const hours = String(date.getUTCHours()).padStart(2, '0');
+            const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
         }
 
-        // Calculate Asian Range Fibonacci 50%
         async function calculateAsianRangeFib50(symbol, startTime, endTime) {
             try {
                 const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=15m&startTime=${startTime}&endTime=${endTime}&limit=1000`;
@@ -514,26 +264,30 @@
                     throw new Error('No data returned from API');
                 }
 
-                // Calculate wick high and wick low from all candles
-                let wickHigh = -Infinity;
-                let wickLow = Infinity;
+                // CORRECT PINE SCRIPT LOGIC:
+                // Initialize with FIRST candle's high/low
+                let ar_wickHigh = parseFloat(klines[0][2]); // First candle high
+                let ar_wickLow = parseFloat(klines[0][3]);  // First candle low
 
-                for (const candle of klines) {
-                    const high = parseFloat(candle[2]);
-                    const low = parseFloat(candle[3]);
+                // Update with each subsequent candle
+                for (let i = 1; i < klines.length; i++) {
+                    const high = parseFloat(klines[i][2]);
+                    const low = parseFloat(klines[i][3]);
                     
-                    if (high > wickHigh) wickHigh = high;
-                    if (low < wickLow) wickLow = low;
+                    // Only update if current value is higher/lower
+                    ar_wickHigh = Math.max(high, ar_wickHigh);
+                    ar_wickLow = Math.min(low, ar_wickLow);
                 }
 
-                // Calculate Fibonacci 50%
-                const fib50 = (wickHigh + wickLow) / 2;
+                // Calculate Fibonacci 50% (remains constant until next Friday)
+                const fib50 = (ar_wickHigh + ar_wickLow) / 2;
 
                 return {
                     fib50,
-                    wickHigh,
-                    wickLow,
-                    candleCount: klines.length
+                    wickHigh: ar_wickHigh,
+                    wickLow: ar_wickLow,
+                    candleCount: klines.length,
+                    rangeSize: ar_wickHigh - ar_wickLow
                 };
             } catch (error) {
                 console.error(`Error calculating Fib50 for ${symbol}:`, error);
@@ -541,338 +295,64 @@
             }
         }
 
-        // Delay function for batch processing
-        function delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        async function startScan() {
-            const scanBtn = document.getElementById('scanBtn');
-            const statusDiv = document.getElementById('status');
-            const statsDiv = document.getElementById('stats');
-            const tableDiv = document.getElementById('resultsTable');
-            const debugPanel = document.getElementById('debugPanel');
+        async function calculateAll() {
+            const symbolsInput = document.getElementById('symbols').value;
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
             
-            scanBtn.disabled = true;
-            scanBtn.innerHTML = '<div class="loading-spinner"></div><span>Scanning...</span>';
-            statusDiv.className = 'show info';
-            statusDiv.textContent = 'Initializing scan...';
+            const symbols = symbolsInput.split(',').map(s => s.trim().toUpperCase());
             
-            allResults = [];
-            scanResults = [];
-
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="loading">⏳ Calculating...</div>';
+            
+            const startTime = startDate.getTime();
+            const endTime = endDate.getTime();
+            
             try {
-                // Get Asian session times
-                statusDiv.textContent = 'Calculating Asian session timeframe...';
-                const { startTime, endTime, startDate, endDate } = getAsianSessionTimes();
+                const results = await Promise.all(
+                    symbols.map(symbol => calculateAsianRangeFib50(symbol, startTime, endTime))
+                );
                 
-                // Fetch all USDT trading pairs
-                statusDiv.textContent = 'Fetching trading pairs...';
-                const exchangeInfoResponse = await fetch('https://api.binance.com/api/v3/exchangeInfo');
-                const exchangeInfo = await exchangeInfoResponse.json();
-                
-                const usdtPairs = exchangeInfo.symbols
-                    .filter(s => s.symbol.endsWith('USDT') && s.status === 'TRADING')
-                    .map(s => s.symbol);
-
-                statusDiv.textContent = `Found ${usdtPairs.length} USDT pairs. Starting analysis...`;
-                
-                // Fetch 24h ticker data for all pairs
-                const tickerResponse = await fetch('https://api.binance.com/api/v3/ticker/24hr');
-                const tickerData = await tickerResponse.json();
-                const tickerMap = new Map(tickerData.map(t => [t.symbol, t]));
-
-                // Process pairs in batches
-                const batchSize = 10;
-                let processedCount = 0;
-                let successCount = 0;
-                let btcAnalysis = null;
-
-                for (let i = 0; i < usdtPairs.length; i++) {
-                    const symbol = usdtPairs[i];
-                    
-                    try {
-                        statusDiv.textContent = `Processing ${i + 1}/${usdtPairs.length}: Fetching Asian Range for ${symbol}...`;
-                        
-                        // Calculate Fib50 for this symbol
-                        const fibData = await calculateAsianRangeFib50(symbol, startTime, endTime);
-                        
-                        // Get current price and volume
-                        const ticker = tickerMap.get(symbol);
-                        if (!ticker) continue;
-                        
-                        const currentPrice = parseFloat(ticker.lastPrice);
-                        const volume = parseFloat(ticker.quoteVolume) / 1000000; // Convert to millions
-                        
-                        // Calculate distance from Fib50
-                        const distance = Math.abs((currentPrice - fibData.fib50) / fibData.fib50 * 100);
-                        
-                        const result = {
-                            symbol,
-                            currentPrice,
-                            fib50: fibData.fib50,
-                            wickHigh: fibData.wickHigh,
-                            wickLow: fibData.wickLow,
-                            distance,
-                            volume,
-                            candleCount: fibData.candleCount
-                        };
-                        
-                        allResults.push(result);
-                        successCount++;
-                        
-                        // Store BTC analysis for debug panel
-                        if (symbol === 'BTCUSDT') {
-                            btcAnalysis = result;
-                        }
-                        
-                        // Delay between requests (150ms)
-                        if ((i + 1) % batchSize === 0) {
-                            await delay(150);
-                        } else {
-                            await delay(150);
-                        }
-                        
-                    } catch (error) {
-                        console.error(`Error processing ${symbol}:`, error);
-                    }
-                    
-                    processedCount++;
-                }
-
-                // Sort by distance
-                allResults.sort((a, b) => a.distance - b.distance);
-                scanResults = [...allResults];
-                
-                // Display results
-                displayResults();
-                updateStats();
-                updateDebugPanel(startDate, endDate, btcAnalysis);
-                
-                statusDiv.className = 'show success';
-                statusDiv.textContent = `Scan complete! Successfully analyzed ${successCount} out of ${processedCount} pairs.`;
-                
-                statsDiv.style.display = 'grid';
-                tableDiv.style.display = 'table';
-                debugPanel.style.display = 'block';
-                document.getElementById('exportBtn').disabled = false;
-                
+                displayResults(symbols, results);
             } catch (error) {
-                statusDiv.className = 'show error';
-                statusDiv.textContent = `Error: ${error.message}`;
-                console.error('Scan error:', error);
-            } finally {
-                scanBtn.disabled = false;
-                scanBtn.innerHTML = '<span>🔍</span><span>Start Scan</span>';
+                resultsDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
             }
         }
 
-        function displayResults() {
-            const tbody = document.getElementById('resultsBody');
-            tbody.innerHTML = '';
+        function displayResults(symbols, results) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
             
-            scanResults.forEach(result => {
-                const row = tbody.insertRow();
-                
-                // Symbol
-                const symbolCell = row.insertCell();
-                symbolCell.innerHTML = `<span class="symbol">${result.symbol}</span>`;
-                
-                // Current Price
-                const priceCell = row.insertCell();
-                priceCell.textContent = formatPrice(result.currentPrice);
-                
-                // Fib50
-                const fib50Cell = row.insertCell();
-                fib50Cell.textContent = formatPrice(result.fib50);
-                
-                // Wick High
-                const wickHighCell = row.insertCell();
-                wickHighCell.textContent = formatPrice(result.wickHigh);
-                
-                // Wick Low
-                const wickLowCell = row.insertCell();
-                wickLowCell.textContent = formatPrice(result.wickLow);
-                
-                // Distance
-                const distanceCell = row.insertCell();
-                const distanceClass = result.distance <= 2 ? 'close' : result.distance <= 5 ? 'medium' : 'far';
-                distanceCell.innerHTML = `<span class="distance ${distanceClass}">${result.distance.toFixed(2)}%</span>`;
-                
-                // Volume
-                const volumeCell = row.insertCell();
-                volumeCell.textContent = result.volume.toFixed(2) + 'M';
-                
-                // Chart Link
-                const chartCell = row.insertCell();
-                chartCell.innerHTML = `<a href="https://www.tradingview.com/chart/?symbol=BINANCE:${result.symbol}" target="_blank" class="chart-link">View</a>`;
+            symbols.forEach((symbol, index) => {
+                const result = results[index];
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.innerHTML = `
+                    <div class="symbol-name">${symbol}</div>
+                    <div class="fib-value">$${result.fib50.toFixed(2)}</div>
+                    <div class="detail-row">
+                        <span class="detail-label">High:</span>
+                        <span class="detail-value">$${result.wickHigh.toFixed(2)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Low:</span>
+                        <span class="detail-value">$${result.wickLow.toFixed(2)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Range:</span>
+                        <span class="detail-value">$${result.rangeSize.toFixed(2)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Candles:</span>
+                        <span class="detail-value">${result.candleCount}</span>
+                    </div>
+                `;
+                resultsDiv.appendChild(card);
             });
         }
 
-        function formatPrice(price) {
-            if (price >= 1000) return price.toFixed(2);
-            if (price >= 1) return price.toFixed(4);
-            if (price >= 0.01) return price.toFixed(6);
-            return price.toFixed(8);
-        }
-
-        function updateStats() {
-            document.getElementById('totalPairs').textContent = allResults.length;
-            
-            const within5 = allResults.filter(r => r.distance <= 5).length;
-            document.getElementById('within5').textContent = within5;
-            
-            const avgDist = allResults.reduce((sum, r) => sum + r.distance, 0) / allResults.length;
-            document.getElementById('avgDistance').textContent = avgDist.toFixed(2) + '%';
-            
-            const closest = allResults[0];
-            document.getElementById('closestPair').textContent = closest ? 
-                `${closest.symbol} (${closest.distance.toFixed(2)}%)` : '-';
-        }
-
-        function updateDebugPanel(startDate, endDate, btcAnalysis) {
-            const debugContent = document.getElementById('debugContent');
-            
-            let html = '<div class="debug-section">';
-            html += '<div class="debug-label">Asian Session Timeframe:</div>';
-            html += `<div>Start: ${startDate.toUTCString()}</div>`;
-            html += `<div>End: ${endDate.toUTCString()}</div>`;
-            html += `<div>Duration: ${((endDate - startDate) / (1000 * 60 * 60)).toFixed(1)} hours</div>`;
-            html += '</div>';
-            
-            if (btcAnalysis) {
-                html += '<div class="debug-section">';
-                html += '<div class="debug-label">BTC Detailed Analysis:</div>';
-                html += `<div>Candle Count: ${btcAnalysis.candleCount}</div>`;
-                html += `<div>Wick High: ${formatPrice(btcAnalysis.wickHigh)}</div>`;
-                html += `<div>Wick Low: ${formatPrice(btcAnalysis.wickLow)}</div>`;
-                html += `<div>Fib 50%: ${formatPrice(btcAnalysis.fib50)}</div>`;
-                html += `<div>Current Price: ${formatPrice(btcAnalysis.currentPrice)}</div>`;
-                html += `<div>Distance: ${btcAnalysis.distance.toFixed(2)}%</div>`;
-                html += `<div>Range: ${formatPrice(btcAnalysis.wickHigh - btcAnalysis.wickLow)}</div>`;
-                html += '</div>';
-            }
-            
-            // Distribution statistics
-            const ranges = [
-                { label: '0-1%', max: 1 },
-                { label: '1-2%', max: 2 },
-                { label: '2-5%', max: 5 },
-                { label: '5-10%', max: 10 },
-                { label: '10-20%', max: 20 },
-                { label: '>20%', max: Infinity }
-            ];
-            
-            html += '<div class="debug-section">';
-            html += '<div class="debug-label">Distance Distribution:</div>';
-            
-            ranges.forEach((range, index) => {
-                const minDist = index === 0 ? 0 : ranges[index - 1].max;
-                const count = allResults.filter(r => r.distance > minDist && r.distance <= range.max).length;
-                const percentage = ((count / allResults.length) * 100).toFixed(1);
-                html += `<div>${range.label}: ${count} pairs (${percentage}%)</div>`;
-            });
-            
-            html += '</div>';
-            
-            debugContent.innerHTML = html;
-        }
-
-        function filterResults() {
-            const searchTerm = document.getElementById('searchInput').value.toUpperCase();
-            const maxDistance = parseFloat(document.getElementById('distanceFilter').value);
-            const minVolume = parseFloat(document.getElementById('minVolume').value) || 0;
-            
-            scanResults = allResults.filter(result => {
-                const matchesSearch = result.symbol.includes(searchTerm);
-                const matchesDistance = result.distance <= maxDistance;
-                const matchesVolume = result.volume >= minVolume;
-                return matchesSearch && matchesDistance && matchesVolume;
-            });
-            
-            displayResults();
-        }
-
-        function sortTable(columnIndex) {
-            const headers = document.querySelectorAll('th');
-            headers.forEach(h => h.classList.remove('sorted-asc', 'sorted-desc'));
-            
-            if (sortColumn === columnIndex) {
-                sortAscending = !sortAscending;
-            } else {
-                sortColumn = columnIndex;
-                sortAscending = true;
-            }
-            
-            const header = headers[columnIndex];
-            header.classList.add(sortAscending ? 'sorted-asc' : 'sorted-desc');
-            
-            const sortKeys = ['symbol', 'currentPrice', 'fib50', 'wickHigh', 'wickLow', 'distance', 'volume'];
-            const key = sortKeys[columnIndex];
-            
-            scanResults.sort((a, b) => {
-                let aVal = a[key];
-                let bVal = b[key];
-                
-                if (typeof aVal === 'string') {
-                    return sortAscending ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-                }
-                
-                return sortAscending ? aVal - bVal : bVal - aVal;
-            });
-            
-            displayResults();
-        }
-
-        function exportToCSV() {
-            const headers = ['Symbol', 'Current Price', 'Fib50', 'Wick High', 'Wick Low', 'Distance (%)', 'Volume (M)'];
-            const rows = scanResults.map(r => [
-                r.symbol,
-                r.currentPrice,
-                r.fib50,
-                r.wickHigh,
-                r.wickLow,
-                r.distance.toFixed(2),
-                r.volume.toFixed(2)
-            ]);
-            
-            let csv = headers.join(',') + '\n';
-            rows.forEach(row => {
-                csv += row.join(',') + '\n';
-            });
-            
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `asian-range-fib50-scan-${new Date().toISOString().split('T')[0]}.csv`;
-            a.click();
-            window.URL.revokeObjectURL(url);
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('light-mode');
-            const icon = document.getElementById('themeIcon');
-            icon.textContent = document.body.classList.contains('light-mode') ? '☀️' : '🌙';
-            
-            // Save preference
-            localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-        }
-
-        // Load saved theme
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'light') {
-                document.body.classList.add('light-mode');
-                document.getElementById('themeIcon').textContent = '☀️';
-            }
-        });
-
-        // Sort by distance on load
-        window.addEventListener('DOMContentLoaded', () => {
-            const headers = document.querySelectorAll('th');
-            headers[5].classList.add('sorted-asc');
-        });
+        // Initialize with default dates
+        setDefaultDates();
     </script>
 </body>
 </html>
