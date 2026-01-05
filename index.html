@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asian Range Fib %50 Tarayıcı</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .header h1 {
+            color: #2d3748;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #718096;
+            font-size: 14px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .scan-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .scan-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .scan-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .results {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .coin-card {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background 0.2s;
+        }
+        
+        .coin-card:last-child {
+            border-bottom: none;
+        }
+        
+        .coin-card:hover {
+            background: #f7fafc;
+        }
+        
+        .coin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .coin-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        
+        .rank {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .coin-data {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 13px;
+        }
+        
+        .data-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .data-label {
+            color: #718096;
+            font-size: 11px;
+            margin-bottom: 3px;
+        }
+        
+        .data-value {
+            color: #2d3748;
+            font-weight: 600;
+        }
+        
+        .distance {
+            font-size: 16px !important;
+            font-weight: 700 !important;
+        }
+        
+        .distance.green {
+            color: #48bb78;
+        }
+        
+        .distance.red {
+            color: #f56565;
+        }
+        
+        .error {
+            background: #fff5f5;
+            color: #c53030;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #fc8181;
+        }
+        
+        .info {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #718096;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .coin-data {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Asian Range Fib %50 Tarayıcı</h1>
+            <p>Cuma Asya seansı %50 Fibonacci seviyesine en yakın coinler</p>
+        </div>
+        
+        <div class="controls">
+            <button class="scan-btn" onclick="scanCoins()">
+                📊 Tarama Başlat
+            </button>
+        </div>
+        
+        <div id="content"></div>
+        
+        <div class="info">
+            <strong>ℹ️ Nasıl Çalışır:</strong><br>
+            • Son Cuma günü Asya seansı (19:00-23:59 NY) wick high/low hesaplanır<br>
+            • %50 Fibonacci: (WickHigh + WickLow) / 2<br>
+            • Mevcut fiyata en yakın Top 10 coin listelenir<br>
+            • Yeşil: Fiyat fib üstünde | Kırmızı: Fiyat fib altında
+        </div>
+    </div>
+    
+    <script>
+        const BINANCE_API = 'https://api.binance.com/api/v3';
+        const TOP_COINS_COUNT = 100;
+        const DISPLAY_COUNT = 10;
+        
+        async function scanCoins() {
+            const content = document.getElementById('content');
+            const btn = document.querySelector('.scan-btn');
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Taranıyor...';
+            
+            content.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Binance'ten veriler çekiliyor...<br>Bu işlem 30-60 saniye sürebilir.</p>
+                </div>
+            `;
+            
+            try {
+                // 1. Get top USDT pairs by volume
+                const tickersResponse = await fetch(`${BINANCE_API}/ticker/24hr`);
+                const tickers = await tickersResponse.json();
+                
+                const usdtPairs = tickers
+                    .filter(t => t.symbol.endsWith('USDT') && !t.symbol.includes('UP') && !t.symbol.includes('DOWN'))
+                    .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume))
+                    .slice(0, TOP_COINS_COUNT)
+                    .map(t => t.symbol);
+                
+                console.log(`📊 ${usdtPairs.length} coin taranıyor...`);
+                
+                // 2. Get last Friday's date
+                const lastFriday = getLastFriday();
+                const startTime = new Date(lastFriday);
+                startTime.setUTCHours(23, 0, 0, 0); // 19:00 NY = 23:00 UTC (DST'ye göre 00:00 olabilir)
+                
+                const endTime = new Date(lastFriday);
+                endTime.setUTCHours(3, 59, 0, 0); // 23:59 NY = 03:59 UTC next day
+                
+                // 3. Calculate Fib 50% for each coin
+                const results = [];
+                
+                for (let i = 0; i < usdtPairs.length; i++) {
+                    const symbol = usdtPairs[i];
+                    
+                    if (i % 10 === 0) {
+                        content.innerHTML = `
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                <p>İşleniyor: ${i}/${usdtPairs.length}</p>
+                            </div>
+                        `;
+                    }
+                    
+                    try {
+                        // Get 5-minute candles for Asian session
+                        const klinesResponse = await fetch(
+                            `${BINANCE_API}/klines?symbol=${symbol}&interval=5m&startTime=${startTime.getTime()}&endTime=${endTime.getTime()}&limit=60`
+                        );
+                        const klines = await klinesResponse.json();
+                        
+                        if (!klines || klines.length === 0) continue;
+                        
+                        // Calculate wick high and low
+                        let wickHigh = -Infinity;
+                        let wickLow = Infinity;
+                        
+                        klines.forEach(candle => {
+                            const high = parseFloat(candle[2]);
+                            const low = parseFloat(candle[3]);
+                            
+                            if (high > wickHigh) wickHigh = high;
+                            if (low < wickLow) wickLow = low;
+                        });
+                        
+                        // Calculate Fib 50%
+                        const fib50 = (wickHigh + wickLow) / 2;
+                        
+                        // Get current price
+                        const priceResponse = await fetch(`${BINANCE_API}/ticker/price?symbol=${symbol}`);
+                        const priceData = await priceResponse.json();
+                        const currentPrice = parseFloat(priceData.price);
+                        
+                        // Calculate distance
+                        const distance = Math.abs(currentPrice - fib50);
+                        const distancePercent = (distance / fib50) * 100;
+                        
+                        results.push({
+                            symbol,
+                            currentPrice,
+                            fib50,
+                            wickHigh,
+                            wickLow,
+                            distancePercent,
+                            isAbove: currentPrice > fib50
+                        });
+                        
+                        // Rate limiting
+                        await sleep(100);
+                        
+                    } catch (err) {
+                        console.error(`Error processing ${symbol}:`, err);
+                    }
+                }
+                
+                // 4. Sort by distance and get top 10
+                results.sort((a, b) => a.distancePercent - b.distancePercent);
+                const top10 = results.slice(0, DISPLAY_COUNT);
+                
+                // 5. Display results
+                displayResults(top10);
+                
+            } catch (error) {
+                content.innerHTML = `
+                    <div class="error">
+                        ❌ Hata oluştu: ${error.message}<br>
+                        Lütfen tekrar deneyin.
+                    </div>
+                `;
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔄 Yeniden Tara';
+            }
+        }
+        
+        function displayResults(coins) {
+            const content = document.getElementById('content');
+            
+            if (coins.length === 0) {
+                content.innerHTML = '<div class="error">Sonuç bulunamadı.</div>';
+                return;
+            }
+            
+            const html = `
+                <div class="results">
+                    ${coins.map((coin, index) => `
+                        <div class="coin-card">
+                            <div class="coin-header">
+                                <span class="coin-name">${coin.symbol}</span>
+                                <span class="rank">#${index + 1}</span>
+                            </div>
+                            <div class="coin-data">
+                                <div class="data-item">
+                                    <span class="data-label">Fiyat</span>
+                                    <span class="data-value">$${coin.currentPrice.toFixed(8)}</span>
+                                </div>
+                                <div class="data-item">
+                                    <span class="data-label">Fib %50</span>
+                                    <span class="data-value">$${coin.fib50.toFixed(8)}</span>
+                                </div>
+                                <div class="data-item">
+                                    <span class="data-label">Wick High</span>
+                                    <span class="data-value">$${coin.wickHigh.toFixed(8)}</span>
+                                </div>
+                                <div class="data-item">
+                                    <span class="data-label">Wick Low</span>
+                                    <span class="data-value">$${coin.wickLow.toFixed(8)}</span>
+                                </div>
+                            </div>
+                            <div style="margin-top: 10px; text-align: center;">
+                                <span class="data-label">Mesafe (Fib'e)</span><br>
+                                <span class="distance ${coin.isAbove ? 'green' : 'red'}">
+                                    ${coin.isAbove ? '▲' : '▼'} ${coin.distancePercent.toFixed(3)}%
+                                </span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            content.innerHTML = html;
+        }
+        
+        function getLastFriday() {
+            const today = new Date();
+            const dayOfWeek = today.getUTCDay();
+            const daysToFriday = (dayOfWeek + 2) % 7; // Days since last Friday
+            const lastFriday = new Date(today);
+            lastFriday.setUTCDate(today.getUTCDate() - daysToFriday);
+            lastFriday.setUTCHours(0, 0, 0, 0);
+            return lastFriday;
+        }
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        // Auto-scan on load
+        window.addEventListener('load', () => {
+            console.log('🚀 Asian Range Fib Scanner loaded');
+        });
+    </script>
+</body>
+</html>
