@@ -1002,7 +1002,7 @@
             try {
                 const response = await fetch('https://api.binance.com/api/v3/exchangeInfo');
                 const data = await response.json();
-                const stablecoins = ['USDCUSDT', 'BUSDUSDT', 'TUSDUSDT', 'USDPUSDT', 'DAIUSDT', 'FDUSDUSDT', 'EURUSDT'];
+                const stablecoins = ['USDCUSDT', 'BUSDUSDT', 'USDEUSDT', 'BFUSDUSDT','USD1USDT', 'XUSDUSDT', 'TUSDUSDT', 'USDPUSDT', 'DAIUSDT', 'FDUSDUSDT', 'EURUSDT'];
                const usdtPairs = data.symbols
                       .filter(s => s.symbol.endsWith('USDT') && s.status === 'TRADING' && !stablecoins.includes(s.symbol))
                       .map(s => s.symbol);
