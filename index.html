@@ -373,7 +373,7 @@
     <div class="container">
         <div class="header">
             <h1>🎯 Asya Range Tarayıcı</h1>
-            <p class="subtitle">Son Cuma Asya seansı Fib50 seviyeleri tarayıcısı</p>
+            <p class="subtitle">Asya seansı (NY 19:00-23:59) Fib50 seviyeleri tarayıcısı</p>
         </div>
 
         <div class="controls">
@@ -392,9 +392,11 @@
             <div class="debug-content" id="debugContent">
                 <div class="debug-info-box">
                     <h3>📅 Taranan Asya Seansı</h3>
-                    <div class="debug-info-line"><strong>Tarih:</strong> <span id="debugDate"></span></div>
-                    <div class="debug-info-line"><strong>⏰ Başlangıç:</strong> <span id="debugStartTime"></span></div>
-                    <div class="debug-info-line"><strong>⏰ Bitiş:</strong> <span id="debugEndTime"></span></div>
+                    <div class="debug-info-line"><strong>Gün:</strong> <span id="debugDay"></span></div>
+                    <div class="debug-info-line"><strong>⏰ Başlangıç (NY):</strong> <span id="debugStartTime"></span></div>
+                    <div class="debug-info-line"><strong>⏰ Bitiş (NY):</strong> <span id="debugEndTime"></span></div>
+                    <div class="debug-info-line"><strong>🌍 Başlangıç (UTC):</strong> <span id="debugStartUTC"></span></div>
+                    <div class="debug-info-line"><strong>🌍 Bitiş (UTC):</strong> <span id="debugEndUTC"></span></div>
                 </div>
 
                 <div class="debug-info-box">
@@ -464,6 +466,20 @@
             }
         };
 
+        // Stablecoin listesi - bunları filtreleyeceğiz
+        const STABLECOINS = [
+            'USDT', 'USDC', 'BUSD', 'DAI', 'TUSD', 'USDP', 'USDD', 'GUSD', 'FRAX',
+            'USDE', 'FDUSD', 'PYUSD', 'SUSD', 'LUSD', 'USDB', 'USDX', 'USD1',
+            'USTC', 'EURT', 'EUROC', 'AEUR', 'PAX', 'PAXG', 'XAUT'
+        ];
+
+        function isStablecoin(symbol) {
+            // Symbol'den USDT'yi çıkar
+            const base = symbol.replace('USDT', '');
+            // Eğer base stablecoin listesinde varsa true döndür
+            return STABLECOINS.includes(base);
+        }
+
         function toggleDebug() {
             const content = document.getElementById('debugContent');
             const icon = document.getElementById('debugIcon');
@@ -480,33 +496,11 @@
         function updateDebugPanel() {
             document.getElementById('debugSection').style.display = 'block';
             
-            const lastFriday = debugData.lastFriday;
-            const startTime = debugData.startTime;
-            const endTime = debugData.endTime;
-            
-            document.getElementById('debugDate').textContent = lastFriday ? 
-                new Date(lastFriday).toLocaleDateString('tr-TR', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                }) : '-';
-            
-            document.getElementById('debugStartTime').textContent = startTime ? 
-                new Date(startTime).toLocaleString('tr-TR', { 
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    second: '2-digit',
-                    timeZoneName: 'short'
-                }) : '-';
-            
-            document.getElementById('debugEndTime').textContent = endTime ? 
-                new Date(endTime).toLocaleString('tr-TR', { 
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    second: '2-digit',
-                    timeZoneName: 'short'
-                }) : '-';
+            document.getElementById('debugDay').textContent = debugData.dayName || '-';
+            document.getElementById('debugStartTime').textContent = debugData.startTimeNY || '-';
+            document.getElementById('debugEndTime').textContent = debugData.endTimeNY || '-';
+            document.getElementById('debugStartUTC').textContent = debugData.startTimeUTC || '-';
+            document.getElementById('debugEndUTC').textContent = debugData.endTimeUTC || '-';
 
             const btc = debugData.btc;
             document.getElementById('debugCandleCount').textContent = btc.candleCount || '-';
@@ -537,34 +531,74 @@
             document.getElementById('loadingText').textContent = `Piyasalar taranıyor... (${current}/${total})`;
         }
 
-        function getLastFriday() {
+        function getLastThursday() {
             const now = new Date();
-            const dayOfWeek = now.getUTCDay();
-            const daysToSubtract = dayOfWeek >= 5 ? dayOfWeek - 5 : dayOfWeek + 2;
-            const lastFriday = new Date(now);
-            lastFriday.setUTCDate(now.getUTCDate() - daysToSubtract);
-            lastFriday.setUTCHours(0, 0, 0, 0);
+            const dayOfWeek = now.getDay();
+            // Perşembe = 4
+            let daysToSubtract;
             
-            console.log('🗓️ Last Friday:', lastFriday.toISOString());
-            debugData.lastFriday = lastFriday.toISOString();
+            if (dayOfWeek >= 4) {
+                daysToSubtract = dayOfWeek - 4;
+            } else {
+                daysToSubtract = dayOfWeek + 3;
+            }
             
-            return lastFriday;
+            const lastThursday = new Date(now);
+            lastThursday.setDate(now.getDate() - daysToSubtract);
+            
+            return lastThursday;
         }
 
-        function getAsianSessionTimes(date) {
-            const startTime = new Date(date);
-            startTime.setUTCHours(0, 0, 0, 0);
+        function getAsianSessionTimes() {
+            const thursday = getLastThursday();
             
-            const endTime = new Date(date);
-            endTime.setUTCHours(8, 0, 0, 0);
+            // New York saati 19:00 (Perşembe)
+            // NY = UTC-5 (Kış) veya UTC-4 (Yaz)
+            // Şimdilik UTC-5 kullanıyoruz
+            const startNY = new Date(thursday);
+            startNY.setHours(19, 0, 0, 0);
             
-            console.log('⏰ Asian Session Start:', startTime.toISOString());
-            console.log('⏰ Asian Session End:', endTime.toISOString());
+            // New York saati 23:59 (Perşembe)
+            const endNY = new Date(thursday);
+            endNY.setHours(23, 59, 0, 0);
             
-            debugData.startTime = startTime.toISOString();
-            debugData.endTime = endTime.toISOString();
+            // UTC'ye çevir (NY + 5 saat)
+            const startUTC = new Date(startNY.getTime() + (5 * 60 * 60 * 1000));
+            const endUTC = new Date(endNY.getTime() + (5 * 60 * 60 * 1000));
             
-            return { startTime: startTime.getTime(), endTime: endTime.getTime() };
+            // Debug bilgileri
+            debugData.dayName = thursday.toLocaleDateString('tr-TR', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            debugData.startTimeNY = startNY.toLocaleString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                timeZone: 'America/New_York'
+            });
+            
+            debugData.endTimeNY = endNY.toLocaleString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                timeZone: 'America/New_York'
+            });
+            
+            debugData.startTimeUTC = startUTC.toISOString();
+            debugData.endTimeUTC = endUTC.toISOString();
+            
+            console.log('🗓️ Last Thursday:', thursday.toLocaleDateString());
+            console.log('⏰ Asian Session Start (NY):', startNY.toLocaleString());
+            console.log('⏰ Asian Session End (NY):', endNY.toLocaleString());
+            console.log('🌍 Asian Session Start (UTC):', startUTC.toISOString());
+            console.log('🌍 Asian Session End (UTC):', endUTC.toISOString());
+            
+            return { 
+                startTime: startUTC.getTime(), 
+                endTime: endUTC.getTime() 
+            };
         }
 
         async function getKlines(symbol, startTime, endTime) {
@@ -661,10 +695,10 @@
             };
 
             let errorMessages = [];
+            let filteredStablecoins = [];
 
             try {
-                const lastFriday = getLastFriday();
-                const { startTime, endTime } = getAsianSessionTimes(lastFriday);
+                const { startTime, endTime } = getAsianSessionTimes();
 
                 const response = await fetch('https://api.binance.com/api/v3/exchangeInfo');
                 if (!response.ok) {
@@ -673,11 +707,22 @@
                 
                 const data = await response.json();
                 
-                const usdtPairs = data.symbols
+                // USDT paritelerini filtrele ve stablecoin'leri çıkar
+                const allPairs = data.symbols
                     .filter(s => s.symbol.endsWith('USDT') && s.status === 'TRADING')
                     .map(s => s.symbol);
+                
+                const usdtPairs = allPairs.filter(symbol => {
+                    if (isStablecoin(symbol)) {
+                        filteredStablecoins.push(symbol);
+                        return false;
+                    }
+                    return true;
+                });
 
-                console.log(`📊 Scanning ${usdtPairs.length} pairs...`);
+                console.log(`📊 Total pairs: ${allPairs.length}`);
+                console.log(`🚫 Filtered stablecoins: ${filteredStablecoins.length}`, filteredStablecoins);
+                console.log(`✅ Scanning ${usdtPairs.length} pairs...`);
 
                 const results = [];
                 let processedCount = 0;
@@ -726,7 +771,7 @@
                     processedCount++;
                     updateProgress(processedCount, usdtPairs.length);
 
-                    // Rate limit koruması - her 10 istekte bir daha uzun bekle
+                    // Rate limit koruması
                     if (processedCount % 10 === 0) {
                         await new Promise(resolve => setTimeout(resolve, 500));
                     } else {
@@ -736,7 +781,7 @@
 
                 results.sort((a, b) => a.distance - b.distance);
 
-                displayResults(results, tolerance, errorMessages);
+                displayResults(results, tolerance, errorMessages, filteredStablecoins.length);
                 updateDebugPanel();
 
             } catch (error) {
@@ -750,11 +795,15 @@
             }
         }
 
-        function displayResults(results, tolerance, errorMessages) {
+        function displayResults(results, tolerance, errorMessages, filteredCount) {
             const resultsDiv = document.getElementById('results');
             const contentDiv = document.getElementById('resultsContent');
 
             let html = '';
+
+            if (filteredCount > 0) {
+                html += `<div class="warning">ℹ️ <strong>${filteredCount}</strong> stablecoin filtrelendi.</div>`;
+            }
 
             if (errorMessages.length > 0) {
                 html += `<div class="warning">⚠️ <strong>${errorMessages.length}</strong> coin taranırken hata oluştu.</div>`;
