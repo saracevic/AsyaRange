@@ -233,6 +233,36 @@
             100% { transform: rotate(360deg); }
         }
 
+        .progress-container {
+            margin-top: 20px;
+        }
+
+        .progress-bar-bg {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 30px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .progress-text {
+            margin-top: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+
         .results {
             background: white;
             border-radius: 15px;
@@ -308,6 +338,16 @@
             padding: 15px;
             border-radius: 8px;
             border-left: 4px solid #f5c6cb;
+            margin: 10px 0;
+        }
+
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffeaa7;
+            margin: 10px 0;
         }
 
         @media (max-width: 768px) {
@@ -397,7 +437,13 @@
 
         <div id="loading" class="loading" style="display: none;">
             <div class="spinner"></div>
-            <p>Piyasalar taranıyor...</p>
+            <p id="loadingText">Piyasalar taranıyor...</p>
+            <div class="progress-container">
+                <div class="progress-bar-bg">
+                    <div id="progressBar" class="progress-bar"></div>
+                </div>
+                <p id="progressText" class="progress-text">0 / 0</p>
+            </div>
         </div>
 
         <div id="results" class="results" style="display: none;">
@@ -434,7 +480,6 @@
         function updateDebugPanel() {
             document.getElementById('debugSection').style.display = 'block';
             
-            // Date and time info
             const lastFriday = debugData.lastFriday;
             const startTime = debugData.startTime;
             const endTime = debugData.endTime;
@@ -463,7 +508,6 @@
                     timeZoneName: 'short'
                 }) : '-';
 
-            // BTC analysis
             const btc = debugData.btc;
             document.getElementById('debugCandleCount').textContent = btc.candleCount || '-';
             document.getElementById('debugWickHigh').textContent = btc.wickHigh ? 
@@ -477,13 +521,20 @@
             document.getElementById('debugDistance').textContent = btc.distance !== undefined ? 
                 btc.distance.toFixed(2) : '-';
 
-            // Statistics
             const stats = debugData.stats;
             document.getElementById('statTotal').textContent = stats.total;
             document.getElementById('stat1').textContent = stats.within1;
             document.getElementById('stat2').textContent = stats.within2;
             document.getElementById('stat5').textContent = stats.within5;
             document.getElementById('stat10').textContent = stats.within10;
+        }
+
+        function updateProgress(current, total) {
+            const percentage = Math.round((current / total) * 100);
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressBar').textContent = percentage + '%';
+            document.getElementById('progressText').textContent = `${current} / ${total}`;
+            document.getElementById('loadingText').textContent = `Piyasalar taranıyor... (${current}/${total})`;
         }
 
         function getLastFriday() {
@@ -517,16 +568,36 @@
         }
 
         async function getKlines(symbol, startTime, endTime) {
-            const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=15m&startTime=${startTime}&endTime=${endTime}`;
-            const response = await fetch(url);
-            return await response.json();
+            try {
+                const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=15m&startTime=${startTime}&endTime=${endTime}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error(`Error fetching klines for ${symbol}:`, error);
+                return null;
+            }
         }
 
         async function getCurrentPrice(symbol) {
-            const url = `https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            return parseFloat(data.price);
+            try {
+                const url = `https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                return parseFloat(data.price);
+            } catch (error) {
+                console.error(`Error fetching price for ${symbol}:`, error);
+                return null;
+            }
         }
 
         async function calculateFib50(symbol, startTime, endTime) {
@@ -534,7 +605,6 @@
                 const klines = await getKlines(symbol, startTime, endTime);
                 
                 if (!klines || klines.length === 0) {
-                    console.warn(`⚠️ No klines data for ${symbol}`);
                     return null;
                 }
 
@@ -551,7 +621,6 @@
 
                 const fib50 = (wickHigh + wickLow) / 2;
                 
-                // Log BTC detailed calculation
                 if (symbol === 'BTCUSDT') {
                     console.log('📊 BTC/USDT Detailed Calculation:');
                     console.log('  - Candle Count:', klines.length);
@@ -583,7 +652,6 @@
             document.getElementById('results').style.display = 'none';
             document.getElementById('debugSection').style.display = 'none';
 
-            // Reset stats
             debugData.stats = {
                 total: 0,
                 within1: 0,
@@ -592,11 +660,17 @@
                 within10: 0
             };
 
+            let errorMessages = [];
+
             try {
                 const lastFriday = getLastFriday();
                 const { startTime, endTime } = getAsianSessionTimes(lastFriday);
 
                 const response = await fetch('https://api.binance.com/api/v3/exchangeInfo');
+                if (!response.ok) {
+                    throw new Error('Binance API bağlantısı başarısız');
+                }
+                
                 const data = await response.json();
                 
                 const usdtPairs = data.symbols
@@ -606,52 +680,69 @@
                 console.log(`📊 Scanning ${usdtPairs.length} pairs...`);
 
                 const results = [];
+                let processedCount = 0;
 
                 for (const symbol of usdtPairs) {
-                    const fibData = await calculateFib50(symbol, startTime, endTime);
-                    
-                    if (fibData) {
-                        const currentPrice = await getCurrentPrice(symbol);
-                        const distance = Math.abs(((currentPrice - fibData.fib50) / fibData.fib50) * 100);
-
-                        // Log current price for BTC
-                        if (symbol === 'BTCUSDT') {
-                            console.log('  - Current Price:', currentPrice.toFixed(2));
-                            console.log('  - Distance:', distance.toFixed(2) + '%');
-                            debugData.btc.currentPrice = currentPrice;
-                            debugData.btc.distance = distance;
-                        }
-
-                        debugData.stats.total++;
+                    try {
+                        const fibData = await calculateFib50(symbol, startTime, endTime);
                         
-                        if (distance <= 1) debugData.stats.within1++;
-                        if (distance <= 2) debugData.stats.within2++;
-                        if (distance <= 5) debugData.stats.within5++;
-                        if (distance <= 10) debugData.stats.within10++;
+                        if (fibData) {
+                            const currentPrice = await getCurrentPrice(symbol);
+                            
+                            if (currentPrice !== null) {
+                                const distance = Math.abs(((currentPrice - fibData.fib50) / fibData.fib50) * 100);
 
-                        if (distance <= tolerance) {
-                            results.push({
-                                symbol,
-                                fib50: fibData.fib50,
-                                currentPrice,
-                                distance,
-                                wickHigh: fibData.wickHigh,
-                                wickLow: fibData.wickLow
-                            });
+                                if (symbol === 'BTCUSDT') {
+                                    console.log('  - Current Price:', currentPrice.toFixed(2));
+                                    console.log('  - Distance:', distance.toFixed(2) + '%');
+                                    debugData.btc.currentPrice = currentPrice;
+                                    debugData.btc.distance = distance;
+                                }
+
+                                debugData.stats.total++;
+                                
+                                if (distance <= 1) debugData.stats.within1++;
+                                if (distance <= 2) debugData.stats.within2++;
+                                if (distance <= 5) debugData.stats.within5++;
+                                if (distance <= 10) debugData.stats.within10++;
+
+                                if (distance <= tolerance) {
+                                    results.push({
+                                        symbol,
+                                        fib50: fibData.fib50,
+                                        currentPrice,
+                                        distance,
+                                        wickHigh: fibData.wickHigh,
+                                        wickLow: fibData.wickLow
+                                    });
+                                }
+                            }
                         }
+                    } catch (error) {
+                        console.error(`Error processing ${symbol}:`, error);
+                        errorMessages.push(`${symbol}: ${error.message}`);
                     }
 
-                    await new Promise(resolve => setTimeout(resolve, 100));
+                    processedCount++;
+                    updateProgress(processedCount, usdtPairs.length);
+
+                    // Rate limit koruması - her 10 istekte bir daha uzun bekle
+                    if (processedCount % 10 === 0) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    } else {
+                        await new Promise(resolve => setTimeout(resolve, 150));
+                    }
                 }
 
                 results.sort((a, b) => a.distance - b.distance);
 
-                displayResults(results, tolerance);
+                displayResults(results, tolerance, errorMessages);
                 updateDebugPanel();
 
             } catch (error) {
+                console.error('Scan error:', error);
                 document.getElementById('resultsContent').innerHTML = 
-                    `<div class="error">Hata oluştu: ${error.message}</div>`;
+                    `<div class="error">❌ Kritik Hata: ${error.message}</div>`;
                 document.getElementById('results').style.display = 'block';
             } finally {
                 document.getElementById('loading').style.display = 'none';
@@ -659,14 +750,20 @@
             }
         }
 
-        function displayResults(results, tolerance) {
+        function displayResults(results, tolerance, errorMessages) {
             const resultsDiv = document.getElementById('results');
             const contentDiv = document.getElementById('resultsContent');
 
+            let html = '';
+
+            if (errorMessages.length > 0) {
+                html += `<div class="warning">⚠️ <strong>${errorMessages.length}</strong> coin taranırken hata oluştu.</div>`;
+            }
+
             if (results.length === 0) {
-                contentDiv.innerHTML = `<p>%${tolerance} tolerans içinde sonuç bulunamadı.</p>`;
+                html += `<p>%${tolerance} tolerans içinde sonuç bulunamadı.</p>`;
             } else {
-                let html = `
+                html += `
                     <p><strong>${results.length}</strong> coin %${tolerance} tolerans içinde bulundu.</p>
                     <table>
                         <thead>
@@ -700,10 +797,9 @@
                         </tbody>
                     </table>
                 `;
-
-                contentDiv.innerHTML = html;
             }
 
+            contentDiv.innerHTML = html;
             resultsDiv.style.display = 'block';
         }
     </script>
