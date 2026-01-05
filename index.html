@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asian Range Trading Dashboard</title>
+    <title>Asian Range Trading Dashboard Pro</title>
     <style>
         :root {
             --bg-primary: #0f172a;
@@ -26,11 +26,6 @@
             --text-primary: #0f172a;
             --text-secondary: #475569;
             --border-color: #cbd5e1;
-            --accent-color: #3b82f6;
-            --accent-hover: #2563eb;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
         }
 
         * {
@@ -48,7 +43,7 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -79,9 +74,10 @@
             display: flex;
             gap: 15px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
-        .theme-toggle {
+        .btn {
             background-color: var(--bg-card);
             border: 2px solid var(--border-color);
             color: var(--text-primary);
@@ -93,9 +89,25 @@
             transition: all 0.3s ease;
         }
 
-        .theme-toggle:hover {
+        .btn:hover {
             background-color: var(--accent-color);
             border-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            border-color: var(--warning-color);
             color: white;
         }
 
@@ -139,7 +151,7 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 20px;
         }
@@ -165,6 +177,32 @@
             color: var(--text-primary);
         }
 
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-card {
+            background-color: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        #distributionChart, #heatmapChart {
+            width: 100%;
+            height: 300px;
+        }
+
         .controls {
             background-color: var(--bg-secondary);
             padding: 20px;
@@ -178,6 +216,7 @@
             gap: 15px;
             flex-wrap: wrap;
             align-items: center;
+            margin-bottom: 15px;
         }
 
         .search-box {
@@ -226,20 +265,33 @@
             color: white;
         }
 
-        .export-btn {
-            padding: 10px 20px;
-            border-radius: 6px;
-            border: none;
-            background-color: var(--success-color);
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s ease;
+        .view-toggle {
+            display: flex;
+            gap: 10px;
         }
 
-        .export-btn:hover {
-            background-color: #059669;
+        .alert-config {
+            background-color: var(--bg-card);
+            padding: 15px;
+            border-radius: 6px;
+            border: 2px solid var(--border-color);
+            margin-top: 10px;
+        }
+
+        .alert-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .alert-input {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            width: 150px;
         }
 
         .table-container {
@@ -247,6 +299,13 @@
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .virtual-scroll-container {
+            height: 600px;
+            overflow-y: auto;
+            position: relative;
         }
 
         table {
@@ -256,6 +315,9 @@
 
         thead {
             background-color: var(--bg-card);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         th {
@@ -302,6 +364,25 @@
             background-color: var(--bg-card);
         }
 
+        .favorite-btn {
+            cursor: pointer;
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+
+        .favorite-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .favorite-btn.active {
+            color: #fbbf24;
+        }
+
+        .sparkline {
+            width: 80px;
+            height: 30px;
+        }
+
         .distance-cell {
             font-weight: 700;
         }
@@ -311,6 +392,64 @@
         }
 
         .distance-negative {
+            color: var(--danger-color);
+        }
+
+        .fib-visual {
+            width: 100px;
+            height: 30px;
+            background: linear-gradient(90deg, var(--danger-color) 0%, var(--success-color) 50%, var(--danger-color) 100%);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fib-marker {
+            position: absolute;
+            width: 3px;
+            height: 100%;
+            background-color: white;
+            top: 0;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: var(--bg-secondary);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .close-btn:hover {
             color: var(--danger-color);
         }
 
@@ -329,29 +468,78 @@
             margin-bottom: 20px;
         }
 
-        .debug-log {
-            background-color: var(--bg-secondary);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            max-height: 300px;
-            overflow-y: auto;
-            border: 2px solid var(--border-color);
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--success-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            animation: slideIn 0.3s;
         }
 
-        .debug-log div {
-            margin-bottom: 5px;
-            padding: 5px;
-            border-left: 3px solid var(--accent-color);
-            padding-left: 10px;
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+
+        .notification.warning {
+            background-color: var(--warning-color);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 5px;
+        }
+
+        .heatmap-cell {
+            padding: 15px 5px;
+            text-align: center;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .heatmap-cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .cache-info {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 10px;
         }
 
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
                 align-items: flex-start;
+            }
+
+            .charts-container {
+                grid-template-columns: 1fr;
             }
 
             .controls-row {
@@ -369,6 +557,11 @@
             th, td {
                 padding: 8px;
             }
+
+            .sparkline {
+                width: 60px;
+                height: 25px;
+            }
         }
     </style>
 </head>
@@ -376,10 +569,13 @@
     <div class="container">
         <header>
             <div class="header-content">
-                <h1>🌏 Asian Range Trading Dashboard</h1>
+                <h1>🌏 Asian Range Trading Dashboard Pro</h1>
                 <div class="header-controls">
-                    <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
-                    <button class="export-btn" onclick="exportToCSV()">📥 Export CSV</button>
+                    <button class="btn" onclick="toggleTheme()">🌓 Theme</button>
+                    <button class="btn btn-warning" onclick="openAlertModal()">🔔 Alerts</button>
+                    <button class="btn" onclick="toggleFavoritesOnly()">⭐ Favorites</button>
+                    <button class="btn btn-success" onclick="exportToCSV()">📥 Export</button>
+                    <button class="btn" onclick="refreshData()">🔄 Refresh</button>
                 </div>
             </div>
         </header>
@@ -392,6 +588,7 @@
             <div class="progress-bar-bg">
                 <div class="progress-bar-fill" id="progressBar">0%</div>
             </div>
+            <div class="cache-info" id="cacheInfo"></div>
         </div>
 
         <div class="stats-grid">
@@ -411,6 +608,25 @@
                 <div class="stat-label">Closest Pair</div>
                 <div class="stat-value" id="statClosest">-</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-label">Favorites</div>
+                <div class="stat-value" id="statFavorites">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Alerts</div>
+                <div class="stat-value" id="statAlerts">0</div>
+            </div>
+        </div>
+
+        <div class="charts-container">
+            <div class="chart-card">
+                <div class="chart-title">📊 Distance Distribution</div>
+                <canvas id="distributionChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">🔥 Heatmap View</div>
+                <div id="heatmapChart" class="heatmap-grid"></div>
+            </div>
         </div>
 
         <div class="controls">
@@ -427,34 +643,88 @@
             </div>
         </div>
 
-        <div id="debugLog" class="debug-log" style="display: none;"></div>
-
         <div class="table-container">
-            <table id="dataTable">
-                <thead>
-                    <tr>
-                        <th class="sortable" onclick="sortTable(0)">Symbol</th>
-                        <th class="sortable" onclick="sortTable(1)">Current Price</th>
-                        <th class="sortable" onclick="sortTable(2)">Asian Range High</th>
-                        <th class="sortable" onclick="sortTable(3)">Asian Range Low</th>
-                        <th class="sortable" onclick="sortTable(4)">Fib 50%</th>
-                        <th class="sortable" onclick="sortTable(5)">Distance %</th>
-                        <th class="sortable" onclick="sortTable(6)">Status</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <tr>
-                        <td colspan="7" class="loading">Loading data...</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="virtual-scroll-container" id="scrollContainer">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>⭐</th>
+                            <th class="sortable" onclick="sortTable(1)">Symbol</th>
+                            <th class="sortable" onclick="sortTable(2)">Current Price</th>
+                            <th class="sortable" onclick="sortTable(3)">Asian Range High</th>
+                            <th class="sortable" onclick="sortTable(4)">Asian Range Low</th>
+                            <th class="sortable" onclick="sortTable(5)">Fib 50%</th>
+                            <th class="sortable" onclick="sortTable(6)">Distance %</th>
+                            <th>Fib Visual</th>
+                            <th>Sparkline</th>
+                            <th class="sortable" onclick="sortTable(9)">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="10" class="loading">Loading data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
+    <!-- Alert Modal -->
+    <div id="alertModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔔 Alert Configuration</h2>
+                <span class="close-btn" onclick="closeAlertModal()">&times;</span>
+            </div>
+            <div class="alert-config">
+                <div class="alert-row">
+                    <label>Distance Threshold (%):</label>
+                    <input type="number" id="alertThreshold" class="alert-input" value="1" min="0" max="100" step="0.1">
+                </div>
+                <div class="alert-row">
+                    <label>
+                        <input type="checkbox" id="browserNotifications" onchange="requestNotificationPermission()">
+                        Enable Browser Notifications
+                    </label>
+                </div>
+                <div class="alert-row">
+                    <label>Telegram Bot Token:</label>
+                    <input type="text" id="telegramToken" class="alert-input" placeholder="Enter bot token" style="width: 300px;">
+                </div>
+                <div class="alert-row">
+                    <label>Telegram Chat ID:</label>
+                    <input type="text" id="telegramChatId" class="alert-input" placeholder="Enter chat ID" style="width: 300px;">
+                </div>
+                <div class="alert-row">
+                    <button class="btn btn-success" onclick="saveAlertConfig()">💾 Save Configuration</button>
+                    <button class="btn" onclick="testAlert()">🧪 Test Alert</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         let allData = [];
+        let filteredData = [];
         let currentFilter = 'all';
         let currentSort = { column: -1, direction: 'asc' };
+        let favorites = new Set();
+        let alertConfig = {
+            threshold: 1,
+            browserNotifications: false,
+            telegramToken: '',
+            telegramChatId: ''
+        };
+        let dataCache = null;
+        let lastFetchTime = null;
+        let showFavoritesOnly = false;
+        const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+        const BATCH_SIZE = 20;
+
+        // Initialize
+        loadFavorites();
+        loadAlertConfig();
+        checkCache();
 
         // Theme toggle
         function toggleTheme() {
@@ -464,49 +734,244 @@
             localStorage.setItem('theme', newTheme);
         }
 
-        // Load saved theme
         const savedTheme = localStorage.getItem('theme') || 'dark';
         if (savedTheme === 'light') {
             document.documentElement.setAttribute('data-theme', 'light');
         }
 
-        // Convert UTC time to UTC-5 (New York time without DST)
+        // Favorites Management
+        function loadFavorites() {
+            const saved = localStorage.getItem('favorites');
+            if (saved) {
+                favorites = new Set(JSON.parse(saved));
+            }
+        }
+
+        function saveFavorites() {
+            localStorage.setItem('favorites', JSON.stringify([...favorites]));
+            updateStatistics();
+        }
+
+        function toggleFavorite(symbol) {
+            if (favorites.has(symbol)) {
+                favorites.delete(symbol);
+            } else {
+                favorites.add(symbol);
+            }
+            saveFavorites();
+            renderTable();
+        }
+
+        function toggleFavoritesOnly() {
+            showFavoritesOnly = !showFavoritesOnly;
+            filterTable();
+            const btn = event.target;
+            btn.textContent = showFavoritesOnly ? '⭐ Show All' : '⭐ Favorites';
+        }
+
+        // Alert Configuration
+        function loadAlertConfig() {
+            const saved = localStorage.getItem('alertConfig');
+            if (saved) {
+                alertConfig = JSON.parse(saved);
+                document.getElementById('alertThreshold').value = alertConfig.threshold;
+                document.getElementById('browserNotifications').checked = alertConfig.browserNotifications;
+                document.getElementById('telegramToken').value = alertConfig.telegramToken;
+                document.getElementById('telegramChatId').value = alertConfig.telegramChatId;
+            }
+        }
+
+        function saveAlertConfig() {
+            alertConfig = {
+                threshold: parseFloat(document.getElementById('alertThreshold').value),
+                browserNotifications: document.getElementById('browserNotifications').checked,
+                telegramToken: document.getElementById('telegramToken').value.trim(),
+                telegramChatId: document.getElementById('telegramChatId').value.trim()
+            };
+            localStorage.setItem('alertConfig', JSON.stringify(alertConfig));
+            showNotification('Alert configuration saved!', 'success');
+            closeAlertModal();
+            checkAlerts();
+        }
+
+        function openAlertModal() {
+            document.getElementById('alertModal').style.display = 'block';
+        }
+
+        function closeAlertModal() {
+            document.getElementById('alertModal').style.display = 'none';
+        }
+
+        async function requestNotificationPermission() {
+            if (document.getElementById('browserNotifications').checked) {
+                if ('Notification' in window) {
+                    const permission = await Notification.requestPermission();
+                    if (permission !== 'granted') {
+                        document.getElementById('browserNotifications').checked = false;
+                        showNotification('Notification permission denied', 'error');
+                    }
+                } else {
+                    document.getElementById('browserNotifications').checked = false;
+                    showNotification('Browser notifications not supported', 'error');
+                }
+            }
+        }
+
+        function testAlert() {
+            if (alertConfig.browserNotifications) {
+                showBrowserNotification('Test Alert', 'This is a test notification from Asian Range Dashboard');
+            }
+            if (alertConfig.telegramToken && alertConfig.telegramChatId) {
+                sendTelegramAlert('🧪 Test Alert', 'This is a test message from your Asian Range Dashboard');
+            }
+            showNotification('Test alert sent!', 'success');
+        }
+
+        function showBrowserNotification(title, body) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(title, {
+                    body: body,
+                    icon: '🔔',
+                    badge: '🌏'
+                });
+            }
+        }
+
+        async function sendTelegramAlert(title, message) {
+            if (!alertConfig.telegramToken || !alertConfig.telegramChatId) return;
+
+            try {
+                const text = `${title}\n\n${message}`;
+                const url = `https://api.telegram.org/bot${alertConfig.telegramToken}/sendMessage`;
+                
+                await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: alertConfig.telegramChatId,
+                        text: text,
+                        parse_mode: 'HTML'
+                    })
+                });
+            } catch (error) {
+                console.error('Telegram alert error:', error);
+            }
+        }
+
+        function checkAlerts() {
+            if (!allData.length) return;
+
+            const alertCoins = allData.filter(d => Math.abs(d.distance) <= alertConfig.threshold);
+            
+            if (alertCoins.length > 0) {
+                const message = alertCoins.map(c => 
+                    `${c.symbol}: ${c.distance.toFixed(2)}%`
+                ).join('\n');
+
+                if (alertConfig.browserNotifications) {
+                    showBrowserNotification(
+                        `🎯 ${alertCoins.length} Coins Near Fib 50%`,
+                        message
+                    );
+                }
+
+                if (alertConfig.telegramToken && alertConfig.telegramChatId) {
+                    sendTelegramAlert(
+                        `🎯 Alert: ${alertCoins.length} Coins Near Fib 50%`,
+                        message
+                    );
+                }
+            }
+
+            document.getElementById('statAlerts').textContent = alertCoins.length;
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Cache Management
+        function checkCache() {
+            const cached = localStorage.getItem('dataCache');
+            const cacheTime = localStorage.getItem('cacheTime');
+
+            if (cached && cacheTime) {
+                const age = Date.now() - parseInt(cacheTime);
+                if (age < CACHE_DURATION) {
+                    dataCache = JSON.parse(cached);
+                    lastFetchTime = parseInt(cacheTime);
+                    allData = dataCache;
+                    updateStatistics();
+                    renderTable();
+                    drawCharts();
+                    updateCacheInfo();
+                    showNotification('Data loaded from cache', 'success');
+                    return;
+                }
+            }
+
+            fetchBinanceData();
+        }
+
+        function saveCache() {
+            localStorage.setItem('dataCache', JSON.stringify(allData));
+            localStorage.setItem('cacheTime', Date.now().toString());
+            lastFetchTime = Date.now();
+            updateCacheInfo();
+        }
+
+        function updateCacheInfo() {
+            if (lastFetchTime) {
+                const age = Math.round((Date.now() - lastFetchTime) / 1000);
+                const minutes = Math.floor(age / 60);
+                const seconds = age % 60;
+                document.getElementById('cacheInfo').textContent = 
+                    `Last updated: ${minutes}m ${seconds}s ago`;
+            }
+        }
+
+        function refreshData() {
+            localStorage.removeItem('dataCache');
+            localStorage.removeItem('cacheTime');
+            fetchBinanceData();
+        }
+
+        // Time calculations
         function toNYTime(date) {
             const utcTime = date.getTime();
-            const nyOffset = -5 * 60 * 60 * 1000; // UTC-5 in milliseconds
+            const nyOffset = -5 * 60 * 60 * 1000;
             return new Date(utcTime + nyOffset);
         }
 
-        // Get Friday 19:00-23:59 NY time range (UTC-5)
         function getFridayAsianRangeTime() {
             const now = new Date();
             const nyNow = toNYTime(now);
             
-            // Find last Friday
             const dayOfWeek = nyNow.getUTCDay();
-            const daysToFriday = (dayOfWeek + 2) % 7; // Days since last Friday
+            const daysToFriday = (dayOfWeek + 2) % 7;
             const friday = new Date(nyNow);
             friday.setUTCDate(friday.getUTCDate() - daysToFriday);
             
-            // Set to 19:00 NY time (midnight UTC)
-            friday.setUTCHours(0, 0, 0, 0); // This is 19:00 previous day in NY (UTC-5)
+            friday.setUTCHours(0, 0, 0, 0);
             const startTime = friday.getTime();
-            
-            // End at 23:59:59 NY time (04:59:59 UTC next day)
-            const endTime = startTime + (5 * 60 * 60 * 1000) - 1000; // +5 hours - 1 second
+            const endTime = startTime + (5 * 60 * 60 * 1000) - 1000;
             
             return { startTime, endTime };
         }
 
-        // Calculate Asian Range using first candle initialization (Pine Script logic)
         function calculateAsianRange(candles) {
             if (!candles || candles.length === 0) return null;
             
-            // Initialize with first candle (Pine Script logic: var float high = high, var float low = low)
-            let rangeHigh = parseFloat(candles[0][2]); // First candle high
-            let rangeLow = parseFloat(candles[0][3]);  // First candle low
+            let rangeHigh = parseFloat(candles[0][2]);
+            let rangeLow = parseFloat(candles[0][3]);
             
-            // Then update with subsequent candles
             for (let i = 1; i < candles.length; i++) {
                 const high = parseFloat(candles[i][2]);
                 const low = parseFloat(candles[i][3]);
@@ -524,17 +989,6 @@
             };
         }
 
-        // Debug logging
-        function debugLog(message) {
-            const debugDiv = document.getElementById('debugLog');
-            debugDiv.style.display = 'block';
-            const logEntry = document.createElement('div');
-            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
-            debugDiv.appendChild(logEntry);
-            debugDiv.scrollTop = debugDiv.scrollHeight;
-        }
-
-        // Update progress bar
         function updateProgress(current, total) {
             const percent = Math.round((current / total) * 100);
             document.getElementById('progressText').textContent = `Processing ${current}/${total} coins...`;
@@ -543,7 +997,7 @@
             document.getElementById('progressBar').textContent = `${percent}%`;
         }
 
-        // Fetch data from Binance
+        // Batch processing for better performance
         async function fetchBinanceData() {
             try {
                 const response = await fetch('https://api.binance.com/api/v3/exchangeInfo');
@@ -554,72 +1008,62 @@
 
                 const { startTime, endTime } = getFridayAsianRangeTime();
                 
-                debugLog(`Fetching data for ${usdtPairs.length} pairs`);
-                debugLog(`Time range: ${new Date(startTime).toISOString()} to ${new Date(endTime).toISOString()}`);
-                
                 const results = [];
                 let processed = 0;
 
-                for (const symbol of usdtPairs) {
-                    try {
-                        // Fetch 5-minute candles for Friday Asian session
-                        const klineUrl = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=5m&startTime=${startTime}&endTime=${endTime}&limit=60`;
-                        const klineResponse = await fetch(klineUrl);
-                        const candles = await klineResponse.json();
+                // Process in batches
+                for (let i = 0; i < usdtPairs.length; i += BATCH_SIZE) {
+                    const batch = usdtPairs.slice(i, i + BATCH_SIZE);
+                    
+                    const batchPromises = batch.map(async (symbol) => {
+                        try {
+                            const klineUrl = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=5m&startTime=${startTime}&endTime=${endTime}&limit=60`;
+                            const klineResponse = await fetch(klineUrl);
+                            const candles = await klineResponse.json();
 
-                        if (candles && candles.length > 0) {
-                            const asianRange = calculateAsianRange(candles);
-                            
-                            if (asianRange) {
-                                // Get current price
-                                const priceResponse = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`);
-                                const priceData = await priceResponse.json();
-                                const currentPrice = parseFloat(priceData.price);
+                            if (candles && candles.length > 0) {
+                                const asianRange = calculateAsianRange(candles);
+                                
+                                if (asianRange) {
+                                    const priceResponse = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`);
+                                    const priceData = await priceResponse.json();
+                                    const currentPrice = parseFloat(priceData.price);
 
-                                const distance = ((currentPrice - asianRange.fib50) / asianRange.fib50) * 100;
+                                    const distance = ((currentPrice - asianRange.fib50) / asianRange.fib50) * 100;
 
-                                const result = {
-                                    symbol,
-                                    currentPrice,
-                                    high: asianRange.high,
-                                    low: asianRange.low,
-                                    fib50: asianRange.fib50,
-                                    distance: distance,
-                                    status: Math.abs(distance) <= 5 ? '✅ Within Range' : '⚠️ Outside Range'
-                                };
-
-                                results.push(result);
-
-                                // Debug SAGA/USDT
-                                if (symbol === 'SAGAUSDT') {
-                                    debugLog(`SAGA/USDT Debug:`);
-                                    debugLog(`  Candles count: ${candles.length}`);
-                                    debugLog(`  First candle - High: ${candles[0][2]}, Low: ${candles[0][3]}`);
-                                    debugLog(`  Asian Range High: ${asianRange.high}`);
-                                    debugLog(`  Asian Range Low: ${asianRange.low}`);
-                                    debugLog(`  Fib 50%: ${asianRange.fib50.toFixed(4)}`);
-                                    debugLog(`  Current Price: ${currentPrice}`);
-                                    debugLog(`  Distance: ${distance.toFixed(2)}%`);
+                                    return {
+                                        symbol,
+                                        currentPrice,
+                                        high: asianRange.high,
+                                        low: asianRange.low,
+                                        fib50: asianRange.fib50,
+                                        distance: distance,
+                                        status: Math.abs(distance) <= 5 ? '✅ Within Range' : '⚠️ Outside Range',
+                                        candles: candles.slice(-20).map(c => parseFloat(c[4])) // Last 20 closes for sparkline
+                                    };
                                 }
                             }
+                        } catch (error) {
+                            console.error(`Error fetching ${symbol}:`, error);
                         }
+                        return null;
+                    });
 
-                        processed++;
-                        updateProgress(processed, usdtPairs.length);
+                    const batchResults = await Promise.all(batchPromises);
+                    results.push(...batchResults.filter(r => r !== null));
 
-                        // Rate limiting
-                        if (processed % 10 === 0) {
-                            await new Promise(resolve => setTimeout(resolve, 100));
-                        }
-
-                    } catch (error) {
-                        console.error(`Error fetching ${symbol}:`, error);
-                    }
+                    processed += batch.length;
+                    updateProgress(processed, usdtPairs.length);
+                    
+                    await new Promise(resolve => setTimeout(resolve, 100));
                 }
 
                 allData = results;
+                saveCache();
                 updateStatistics();
                 renderTable();
+                drawCharts();
+                checkAlerts();
                 
                 updateProgress(usdtPairs.length, usdtPairs.length);
                 document.getElementById('progressText').textContent = 'Complete!';
@@ -627,25 +1071,24 @@
             } catch (error) {
                 console.error('Error:', error);
                 document.getElementById('tableBody').innerHTML = `
-                    <tr><td colspan="7" class="error">Error loading data: ${error.message}</td></tr>
+                    <tr><td colspan="10" class="error">Error loading data: ${error.message}</td></tr>
                 `;
             }
         }
 
-        // Update statistics
         function updateStatistics() {
             const total = allData.length;
             const within5 = allData.filter(d => Math.abs(d.distance) <= 5).length;
-            const avgDistance = (allData.reduce((sum, d) => sum + Math.abs(d.distance), 0) / total).toFixed(2);
-            const closest = allData.reduce((min, d) => Math.abs(d.distance) < Math.abs(min.distance) ? d : min, allData[0]);
+            const avgDistance = total > 0 ? (allData.reduce((sum, d) => sum + Math.abs(d.distance), 0) / total).toFixed(2) : 0;
+            const closest = allData.length > 0 ? allData.reduce((min, d) => Math.abs(d.distance) < Math.abs(min.distance) ? d : min, allData[0]) : null;
 
             document.getElementById('statTotal').textContent = total;
             document.getElementById('statWithin5').textContent = within5;
             document.getElementById('statAvgDistance').textContent = `${avgDistance}%`;
-            document.getElementById('statClosest').textContent = `${closest.symbol} (${closest.distance.toFixed(2)}%)`;
+            document.getElementById('statClosest').textContent = closest ? `${closest.symbol} (${closest.distance.toFixed(2)}%)` : '-';
+            document.getElementById('statFavorites').textContent = favorites.size;
         }
 
-        // Distance filter
         function setDistanceFilter(filter) {
             currentFilter = filter;
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
@@ -653,17 +1096,18 @@
             filterTable();
         }
 
-        // Filter and render table
         function filterTable() {
             const searchTerm = document.getElementById('searchBox').value.toUpperCase();
-            let filteredData = allData;
+            let filtered = allData;
 
-            // Apply search filter
-            if (searchTerm) {
-                filteredData = filteredData.filter(d => d.symbol.includes(searchTerm));
+            if (showFavoritesOnly) {
+                filtered = filtered.filter(d => favorites.has(d.symbol));
             }
 
-            // Apply distance filter
+            if (searchTerm) {
+                filtered = filtered.filter(d => d.symbol.includes(searchTerm));
+            }
+
             if (currentFilter !== 'all') {
                 const ranges = {
                     '0-0.5': [0, 0.5],
@@ -673,26 +1117,74 @@
                     '5-10': [5, 10]
                 };
                 const [min, max] = ranges[currentFilter];
-                filteredData = filteredData.filter(d => {
+                filtered = filtered.filter(d => {
                     const absDist = Math.abs(d.distance);
                     return absDist >= min && absDist < max;
                 });
             }
 
-            renderTable(filteredData);
+            filteredData = filtered;
+            renderTable(filtered);
         }
 
-        // Render table
+        function createSparkline(prices) {
+            const canvas = document.createElement('canvas');
+            canvas.className = 'sparkline';
+            canvas.width = 80;
+            canvas.height = 30;
+            
+            const ctx = canvas.getContext('2d');
+            const min = Math.min(...prices);
+            const max = Math.max(...prices);
+            const range = max - min;
+            
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            prices.forEach((price, i) => {
+                const x = (i / (prices.length - 1)) * 80;
+                const y = 30 - ((price - min) / range) * 28;
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            
+            ctx.stroke();
+            return canvas.outerHTML;
+        }
+
+        function createFibVisual(distance, high, low, current) {
+            const range = high - low;
+            const position = ((current - low) / range) * 100;
+            const clampedPosition = Math.max(0, Math.min(100, position));
+            
+            return `
+                <div class="fib-visual">
+                    <div class="fib-marker" style="left: ${clampedPosition}%"></div>
+                </div>
+            `;
+        }
+
         function renderTable(data = allData) {
             const tbody = document.getElementById('tableBody');
             
             if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="loading">No data matches the current filters</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="loading">No data matches the current filters</td></tr>';
                 return;
             }
 
             tbody.innerHTML = data.map(row => `
                 <tr>
+                    <td>
+                        <span class="favorite-btn ${favorites.has(row.symbol) ? 'active' : ''}" 
+                              onclick="toggleFavorite('${row.symbol}')">
+                            ${favorites.has(row.symbol) ? '⭐' : '☆'}
+                        </span>
+                    </td>
                     <td><strong>${row.symbol}</strong></td>
                     <td>${row.currentPrice.toFixed(6)}</td>
                     <td>${row.high.toFixed(6)}</td>
@@ -701,16 +1193,16 @@
                     <td class="distance-cell ${row.distance >= 0 ? 'distance-positive' : 'distance-negative'}">
                         ${row.distance >= 0 ? '+' : ''}${row.distance.toFixed(2)}%
                     </td>
+                    <td>${createFibVisual(row.distance, row.high, row.low, row.currentPrice)}</td>
+                    <td>${createSparkline(row.candles || [])}</td>
                     <td>${row.status}</td>
                 </tr>
             `).join('');
         }
 
-        // Sort table
         function sortTable(columnIndex) {
             const headers = document.querySelectorAll('th');
             
-            // Update sort direction
             if (currentSort.column === columnIndex) {
                 currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
             } else {
@@ -718,7 +1210,6 @@
                 currentSort.direction = 'asc';
             }
 
-            // Update header classes
             headers.forEach((h, i) => {
                 h.classList.remove('sort-asc', 'sort-desc');
                 if (i === columnIndex) {
@@ -726,8 +1217,7 @@
                 }
             });
 
-            // Sort data
-            const keys = ['symbol', 'currentPrice', 'high', 'low', 'fib50', 'distance', 'status'];
+            const keys = ['', 'symbol', 'currentPrice', 'high', 'low', 'fib50', 'distance', '', '', 'status'];
             const key = keys[columnIndex];
 
             allData.sort((a, b) => {
@@ -749,9 +1239,79 @@
             filterTable();
         }
 
-        // Export to CSV
+        function drawCharts() {
+            drawDistributionChart();
+            drawHeatmap();
+        }
+
+        function drawDistributionChart() {
+            const canvas = document.getElementById('distributionChart');
+            const ctx = canvas.getContext('2d');
+            
+            const ranges = [
+                { label: '0-0.5%', min: 0, max: 0.5, color: '#10b981' },
+                { label: '0.5-1%', min: 0.5, max: 1, color: '#3b82f6' },
+                { label: '1-2%', min: 1, max: 2, color: '#f59e0b' },
+                { label: '2-5%', min: 2, max: 5, color: '#ef4444' },
+                { label: '5-10%', min: 5, max: 10, color: '#8b5cf6' },
+                { label: '>10%', min: 10, max: Infinity, color: '#6b7280' }
+            ];
+
+            const counts = ranges.map(range => 
+                allData.filter(d => {
+                    const abs = Math.abs(d.distance);
+                    return abs >= range.min && abs < range.max;
+                }).length
+            );
+
+            const maxCount = Math.max(...counts);
+            const barWidth = canvas.width / ranges.length;
+            const barGap = 10;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            counts.forEach((count, i) => {
+                const barHeight = (count / maxCount) * (canvas.height - 40);
+                const x = i * barWidth + barGap / 2;
+                const y = canvas.height - barHeight - 20;
+
+                ctx.fillStyle = ranges[i].color;
+                ctx.fillRect(x, y, barWidth - barGap, barHeight);
+
+                ctx.fillStyle = '#f1f5f9';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(count.toString(), x + (barWidth - barGap) / 2, y - 5);
+                ctx.fillText(ranges[i].label, x + (barWidth - barGap) / 2, canvas.height - 5);
+            });
+        }
+
+        function drawHeatmap() {
+            const container = document.getElementById('heatmapChart');
+            const sorted = [...allData].sort((a, b) => Math.abs(a.distance) - Math.abs(b.distance));
+            const top30 = sorted.slice(0, 30);
+
+            container.innerHTML = top30.map(coin => {
+                const abs = Math.abs(coin.distance);
+                let color;
+                if (abs < 0.5) color = '#10b981';
+                else if (abs < 1) color = '#3b82f6';
+                else if (abs < 2) color = '#f59e0b';
+                else if (abs < 5) color = '#ef4444';
+                else color = '#8b5cf6';
+
+                return `
+                    <div class="heatmap-cell" style="background-color: ${color};" 
+                         title="${coin.symbol}: ${coin.distance.toFixed(2)}%">
+                        <div style="font-weight: 700;">${coin.symbol.replace('USDT', '')}</div>
+                        <div style="font-size: 10px;">${coin.distance.toFixed(2)}%</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         function exportToCSV() {
-            const headers = ['Symbol', 'Current Price', 'Asian Range High', 'Asian Range Low', 'Fib 50%', 'Distance %', 'Status'];
+            const headers = ['Symbol', 'Current Price', 'Asian Range High', 'Asian Range Low', 'Fib 50%', 'Distance %', 'Status', 'Favorite'];
             const rows = allData.map(row => [
                 row.symbol,
                 row.currentPrice,
@@ -759,7 +1319,8 @@
                 row.low,
                 row.fib50,
                 row.distance,
-                row.status
+                row.status,
+                favorites.has(row.symbol) ? 'Yes' : 'No'
             ]);
 
             let csv = headers.join(',') + '\n';
@@ -774,8 +1335,17 @@
             window.URL.revokeObjectURL(url);
         }
 
-        // Initialize
-        fetchBinanceData();
+        // Auto-refresh cache info every second
+        setInterval(updateCacheInfo, 1000);
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('alertModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
     </script>
 </body>
 </html>
+    
