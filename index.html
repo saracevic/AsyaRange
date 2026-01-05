@@ -1002,10 +1002,10 @@
             try {
                 const response = await fetch('https://api.binance.com/api/v3/exchangeInfo');
                 const data = await response.json();
-                const usdtPairs = data.symbols
-                    .filter(s => s.symbol.endsWith('USDT') && s.status === 'TRADING')
-                    .map(s => s.symbol);
-
+                const stablecoins = ['USDCUSDT', 'BUSDUSDT', 'TUSDUSDT', 'USDPUSDT', 'DAIUSDT', 'FDUSDUSDT', 'EURUSDT'];
+               const usdtPairs = data.symbols
+                      .filter(s => s.symbol.endsWith('USDT') && s.status === 'TRADING' && !stablecoins.includes(s.symbol))
+                      .map(s => s.symbol);
                 const { startTime, endTime } = getFridayAsianRangeTime();
                 
                 const results = [];
