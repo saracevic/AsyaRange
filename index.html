@@ -574,7 +574,7 @@
             <div class="header-content">
                 <div>
                     <h1>🎯 Asian Range Fib50 Scanner</h1>
-                    <div class="header-subtitle">Professional Trading Dashboard - Real-time Market Analysis (OPTIMIZED ⚡)</div>
+                    <div class="header-subtitle">Professional Trading Dashboard - TradingView Compatible (Body & Wick)</div>
                 </div>
                 <button class="theme-toggle" onclick="toggleTheme()">
                     <span id="theme-icon">🌙</span> Toggle Theme
@@ -618,7 +618,7 @@
             </div>
 
             <div class="control-group">
-                <label>📊 Distance Filters</label>
+                <label>📊 Distance Filters (Body)</label>
                 <div class="filter-buttons">
                     <button class="filter-btn" onclick="setFilter('0-0.5')" data-range="0-0.5">0-0.5%</button>
                     <button class="filter-btn" onclick="setFilter('0.5-1')" data-range="0.5-1">0.5-1%</button>
@@ -662,10 +662,14 @@
                         <tr>
                             <th class="sortable" onclick="sortTable('symbol')">Symbol</th>
                             <th class="sortable" onclick="sortTable('currentPrice')">Current Price</th>
-                            <th class="sortable" onclick="sortTable('fib50')">Fib50</th>
+                            <th class="sortable" onclick="sortTable('bodyFib50')">Body Fib50</th>
+                            <th class="sortable" onclick="sortTable('wickFib50')">Wick Fib50</th>
+                            <th class="sortable" onclick="sortTable('arBodyHigh')">AR Body High</th>
+                            <th class="sortable" onclick="sortTable('arBodyLow')">AR Body Low</th>
                             <th class="sortable" onclick="sortTable('arWickHigh')">AR Wick High</th>
                             <th class="sortable" onclick="sortTable('arWickLow')">AR Wick Low</th>
-                            <th class="sortable" onclick="sortTable('distance')">Distance (%)</th>
+                            <th class="sortable" onclick="sortTable('bodyDistance')">Body Distance (%)</th>
+                            <th class="sortable" onclick="sortTable('wickDistance')">Wick Distance (%)</th>
                             <th class="sortable" onclick="sortTable('volume')">Volume (M)</th>
                             <th>Chart</th>
                         </tr>
@@ -694,7 +698,7 @@
         // Global variables
         let allResults = [];
         let currentFilter = 'all';
-        let sortColumn = 'distance';
+        let sortColumn = 'bodyDistance';
         let sortDirection = 'asc';
         
         // Configuration
@@ -760,7 +764,7 @@
             return { startTime, endTime };
         }
 
-// Calculate Asian Range and Fib50 (TradingView compatible)
+        // Calculate Asian Range and Fib50 (TradingView compatible)
         function calculateAsianRangeFib50(klines) {
             if (!klines || klines.length === 0) {
                 return { 
@@ -839,7 +843,7 @@
                 const { startTime, endTime } = getAsianSessionTimeRange();
                 
                 // Debug info
-                let debugText = `⚡ OPTIMIZED SCAN MODE ⚡\n\n`;
+                let debugText = `⚡ TRADINGVIEW COMPATIBLE SCAN ⚡\n\n`;
                 debugText += `Asian Session Time Range:\n`;
                 debugText += `Start: ${new Date(startTime).toLocaleString('en-US', {timeZone: 'America/New_York'})} NY\n`;
                 debugText += `End: ${new Date(endTime).toLocaleString('en-US', {timeZone: 'America/New_York'})} NY\n`;
@@ -849,8 +853,8 @@
                 progressContainer.classList.add('active');
                 loadingState.classList.remove('active');
 
-                // STEP 1: Get all tickers in ONE request (HUGE speedup!)
-                debugText += `⚡ Fetching all tickers in one request...\n`;
+                // STEP 1: Get all tickers in ONE request
+                debugText += `⚡ Fetching all tickers...\n`;
                 document.getElementById('debugInfo').textContent = debugText;
                 
                 const allTickers = await fetchBinanceData('https://api.binance.com/api/v3/ticker/24hr');
@@ -881,7 +885,7 @@
                 debugText += `Processing ${symbols.length} symbols...\n\n`;
                 document.getElementById('debugInfo').textContent = debugText;
 
-                // Process in batches to avoid overwhelming the API
+                // Process in batches
                 for (let i = 0; i < symbols.length; i += CONFIG.BATCH_SIZE) {
                     const batch = symbols.slice(i, i + CONFIG.BATCH_SIZE);
                     
@@ -892,19 +896,24 @@
                             const klines = await fetchBinanceData(klinesUrl);
 
                             if (klines && klines.length > 0) {
-                                const { fib50, ar_wickHigh, ar_wickLow } = calculateAsianRangeFib50(klines);
+                                const { bodyFib50, wickFib50, ar_bodyHigh, ar_bodyLow, ar_wickHigh, ar_wickLow } = calculateAsianRangeFib50(klines);
 
-                                if (fib50) {
+                                if (bodyFib50 && wickFib50) {
                                     const ticker = tickerMap.get(symbol);
-                                    const distance = Math.abs(((ticker.price - fib50) / fib50) * 100);
+                                    const bodyDistance = Math.abs(((ticker.price - bodyFib50) / bodyFib50) * 100);
+                                    const wickDistance = Math.abs(((ticker.price - wickFib50) / wickFib50) * 100);
 
                                     return {
                                         symbol,
                                         currentPrice: ticker.price,
-                                        fib50,
+                                        bodyFib50,
+                                        wickFib50,
+                                        arBodyHigh: ar_bodyHigh,
+                                        arBodyLow: ar_bodyLow,
                                         arWickHigh: ar_wickHigh,
                                         arWickLow: ar_wickLow,
-                                        distance,
+                                        bodyDistance,
+                                        wickDistance,
                                         volume: ticker.volume,
                                         klineCount: klines.length
                                     };
@@ -927,7 +936,7 @@
                     document.getElementById('progressFill').style.width = `${percentage}%`;
                     document.getElementById('progressFill').textContent = `${percentage}%`;
 
-                    // Small delay between batches to respect rate limits
+                    // Small delay between batches
                     if (i + CONFIG.BATCH_SIZE < symbols.length) {
                         await new Promise(resolve => setTimeout(resolve, CONFIG.BATCH_DELAY));
                     }
@@ -941,10 +950,14 @@
                 if (btcResult) {
                     debugText += `BTC Analysis:\n`;
                     debugText += `Current Price: ${btcResult.currentPrice.toFixed(2)}\n`;
+                    debugText += `AR Body High: ${btcResult.arBodyHigh.toFixed(2)}\n`;
+                    debugText += `AR Body Low: ${btcResult.arBodyLow.toFixed(2)}\n`;
+                    debugText += `Body Fib50: ${btcResult.bodyFib50.toFixed(2)}\n`;
+                    debugText += `Body Distance: ${btcResult.bodyDistance.toFixed(2)}%\n\n`;
                     debugText += `AR Wick High: ${btcResult.arWickHigh.toFixed(2)}\n`;
                     debugText += `AR Wick Low: ${btcResult.arWickLow.toFixed(2)}\n`;
-                    debugText += `Fib50: ${btcResult.fib50.toFixed(2)}\n`;
-                    debugText += `Distance: ${btcResult.distance.toFixed(2)}%\n`;
+                    debugText += `Wick Fib50: ${btcResult.wickFib50.toFixed(2)}\n`;
+                    debugText += `Wick Distance: ${btcResult.wickDistance.toFixed(2)}%\n`;
                     debugText += `Candles: ${btcResult.klineCount}\n\n`;
                 }
 
@@ -981,19 +994,26 @@
         // Update Statistics
         function updateStatistics() {
             const totalPairs = allResults.length;
-            const within5Percent = allResults.filter(r => r.distance <= 5).length;
-            const avgDistance = totalPairs > 0 
-                ? (allResults.reduce((sum, r) => sum + r.distance, 0) / totalPairs).toFixed(2)
+            const within5PercentBody = allResults.filter(r => r.bodyDistance <= 5).length;
+            const within5PercentWick = allResults.filter(r => r.wickDistance <= 5).length;
+            const avgBodyDistance = totalPairs > 0 
+                ? (allResults.reduce((sum, r) => sum + r.bodyDistance, 0) / totalPairs).toFixed(2)
                 : 0;
-            const closest = allResults.length > 0 
-                ? allResults.reduce((min, r) => r.distance < min.distance ? r : min, allResults[0])
+            const avgWickDistance = totalPairs > 0 
+                ? (allResults.reduce((sum, r) => sum + r.wickDistance, 0) / totalPairs).toFixed(2)
+                : 0;
+            const closestBody = allResults.length > 0 
+                ? allResults.reduce((min, r) => r.bodyDistance < min.bodyDistance ? r : min, allResults[0])
+                : null;
+            const closestWick = allResults.length > 0 
+                ? allResults.reduce((min, r) => r.wickDistance < min.wickDistance ? r : min, allResults[0])
                 : null;
 
             document.getElementById('totalPairs').textContent = totalPairs;
-            document.getElementById('within5Percent').textContent = within5Percent;
-            document.getElementById('avgDistance').textContent = `${avgDistance}%`;
-            document.getElementById('closestPair').textContent = closest 
-                ? `${closest.symbol.replace('USDT', '')} (${closest.distance.toFixed(2)}%)`
+            document.getElementById('within5Percent').textContent = `${within5PercentBody} (Body) / ${within5PercentWick} (Wick)`;
+            document.getElementById('avgDistance').textContent = `${avgBodyDistance}% (Body) / ${avgWickDistance}% (Wick)`;
+            document.getElementById('closestPair').textContent = closestBody 
+                ? `${closestBody.symbol.replace('USDT', '')} (B:${closestBody.bodyDistance.toFixed(2)}% / W:${closestWick.wickDistance.toFixed(2)}%)`
                 : '-';
         }
 
@@ -1029,10 +1049,10 @@
                 // Volume filter
                 if (r.volume < minVolume) return false;
                 
-                // Distance filter
+                // Distance filter - use BODY distance
                 if (currentFilter !== 'all') {
                     const [min, max] = currentFilter.split('-').map(parseFloat);
-                    if (r.distance < min || r.distance > max) return false;
+                    if (r.bodyDistance < min || r.bodyDistance > max) return false;
                 }
                 
                 return true;
@@ -1070,8 +1090,12 @@
             document.getElementById('tableContainer').style.display = 'block';
 
             tbody.innerHTML = filtered.map(r => {
-                const distanceClass = r.distance <= 2 ? 'distance-close' 
-                    : r.distance <= 5 ? 'distance-medium' 
+                const bodyDistanceClass = r.bodyDistance <= 2 ? 'distance-close' 
+                    : r.bodyDistance <= 5 ? 'distance-medium' 
+                    : 'distance-far';
+                
+                const wickDistanceClass = r.wickDistance <= 2 ? 'distance-close' 
+                    : r.wickDistance <= 5 ? 'distance-medium' 
                     : 'distance-far';
                 
                 const baseSymbol = r.symbol.replace('USDT', '');
@@ -1081,10 +1105,14 @@
                     <tr>
                         <td class="symbol-cell">${baseSymbol}</td>
                         <td>${r.currentPrice.toFixed(8)}</td>
-                        <td>${r.fib50.toFixed(8)}</td>
+                        <td>${r.bodyFib50.toFixed(8)}</td>
+                        <td>${r.wickFib50.toFixed(8)}</td>
+                        <td>${r.arBodyHigh.toFixed(8)}</td>
+                        <td>${r.arBodyLow.toFixed(8)}</td>
                         <td>${r.arWickHigh.toFixed(8)}</td>
                         <td>${r.arWickLow.toFixed(8)}</td>
-                        <td><span class="distance-badge ${distanceClass}">${r.distance.toFixed(2)}%</span></td>
+                        <td><span class="distance-badge ${bodyDistanceClass}">${r.bodyDistance.toFixed(2)}%</span></td>
+                        <td><span class="distance-badge ${wickDistanceClass}">${r.wickDistance.toFixed(2)}%</span></td>
                         <td>${r.volume.toFixed(2)}M</td>
                         <td><a href="${tvLink}" target="_blank" class="chart-link">📈 View</a></td>
                     </tr>
@@ -1116,14 +1144,18 @@
         function exportToCSV() {
             if (allResults.length === 0) return;
 
-            const headers = ['Symbol', 'Current Price', 'Fib50', 'AR Wick High', 'AR Wick Low', 'Distance (%)', 'Volume (M)'];
+            const headers = ['Symbol', 'Current Price', 'Body Fib50', 'Wick Fib50', 'AR Body High', 'AR Body Low', 'AR Wick High', 'AR Wick Low', 'Body Distance (%)', 'Wick Distance (%)', 'Volume (M)'];
             const rows = allResults.map(r => [
                 r.symbol.replace('USDT', ''),
                 r.currentPrice,
-                r.fib50,
+                r.bodyFib50,
+                r.wickFib50,
+                r.arBodyHigh,
+                r.arBodyLow,
                 r.arWickHigh,
                 r.arWickLow,
-                r.distance.toFixed(2),
+                r.bodyDistance.toFixed(2),
+                r.wickDistance.toFixed(2),
                 r.volume.toFixed(2)
             ]);
 
@@ -1141,3 +1173,5 @@
     </script>
 </body>
 </html>
+
+    
