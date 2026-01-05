@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asian Range Fibonacci 50%</title>
+    <title>Asian Range Fib50 Scanner - Professional Trading Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -11,348 +11,1062 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --bg-primary: #0f1419;
+            --bg-secondary: #1a1f2e;
+            --bg-card: #252d3d;
+            --text-primary: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --accent-primary: #3b82f6;
+            --accent-hover: #2563eb;
+            --border-color: #374151;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gradient-start: #667eea;
+            --gradient-end: #764ba2;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f3f4f6;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --accent-primary: #3b82f6;
+            --accent-hover: #2563eb;
+            --border-color: #e5e7eb;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
             min-height: 100vh;
-            padding: 20px;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 20px;
         }
 
-        h1 {
-            text-align: center;
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
             color: white;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 8px;
         }
 
-        .controls {
-            background: white;
-            padding: 25px;
+        .header-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .progress-container.active {
+            display: block;
+        }
+
+        .progress-text {
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: var(--bg-secondary);
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        /* Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
             margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        /* Controls */
+        .controls {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
         }
 
         .control-group {
             margin-bottom: 20px;
         }
 
-        label {
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #333;
+            color: var(--text-primary);
         }
 
-        input, button {
+        .control-group input {
             width: 100%;
             padding: 12px;
-            border: 2px solid #ddd;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            font-size: 16px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .control-group input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        /* Filter Buttons */
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
             transition: all 0.3s ease;
         }
 
-        input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-
-        button:hover {
+        .filter-btn:hover {
+            border-color: var(--accent-primary);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        button:active {
-            transform: translateY(0);
+        .filter-btn.active {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
         }
 
-        #results {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .result-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: transform 0.3s ease;
-        }
-
-        .result-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .symbol-name {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .fib-value {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #764ba2;
-            text-align: center;
-            margin: 20px 0;
-            padding: 15px;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border-radius: 10px;
-        }
-
-        .detail-row {
+        /* Action Buttons */
+        .action-buttons {
             display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-
-        .detail-label {
-            color: #666;
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
             font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .detail-value {
-            color: #333;
-            font-weight: bold;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
+        .btn-primary {
+            background: var(--accent-primary);
             color: white;
-            font-size: 1.5em;
         }
 
-        .error {
-            background: #ff4757;
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--success);
             color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Table */
+        .table-container {
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--bg-secondary);
+        }
+
+        th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        th:hover {
+            background: var(--bg-card);
+        }
+
+        th.sortable::after {
+            content: '⇅';
+            margin-left: 8px;
+            opacity: 0.5;
+        }
+
+        th.sort-asc::after {
+            content: '↑';
+            opacity: 1;
+            color: var(--accent-primary);
+        }
+
+        th.sort-desc::after {
+            content: '↓';
+            opacity: 1;
+            color: var(--accent-primary);
+        }
+
+        td {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .symbol-cell {
+            font-weight: 700;
+            color: var(--accent-primary);
+            font-size: 1.05rem;
+        }
+
+        .distance-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .distance-close {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .distance-medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .distance-far {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .chart-link {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .chart-link:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
+        }
+
+        /* Debug Panel */
+        .debug-panel {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .debug-panel h3 {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .debug-content {
+            background: var(--bg-secondary);
             padding: 15px;
             border-radius: 8px;
-            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: none;
             text-align: center;
+            padding: 60px 20px;
         }
 
-        .info-box {
-            background: rgba(255, 255, 255, 0.9);
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--accent-primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Error Message */
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
             padding: 15px;
-            border-radius: 10px;
+            border-radius: 8px;
             margin-bottom: 20px;
-            border-left: 4px solid #667eea;
+            display: none;
         }
 
-        .info-box p {
-            margin: 5px 0;
-            color: #333;
+        .error-message.active {
+            display: block;
         }
 
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+            display: none;
+        }
+
+        .empty-state.active {
+            display: block;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8em;
+            .header h1 {
+                font-size: 1.5rem;
             }
 
-            .result-card {
-                padding: 20px;
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
 
-            .fib-value {
-                font-size: 2em;
+            .filter-buttons {
+                flex-direction: column;
             }
+
+            .filter-btn {
+                width: 100%;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            th, td {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-primary);
         }
     </style>
 </head>
-<body>
+<body data-theme="dark">
     <div class="container">
-        <h1>📊 Asian Range Fibonacci 50%</h1>
-        
-        <div class="controls">
-            <div class="info-box">
-                <p><strong>Asian Session Range:</strong> Friday 17:00 UTC to Monday 00:00 UTC</p>
-                <p><strong>Fibonacci 50%:</strong> (High + Low) / 2</p>
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div>
+                    <h1>🎯 Asian Range Fib50 Scanner</h1>
+                    <div class="header-subtitle">Professional Trading Dashboard - Real-time Market Analysis</div>
+                </div>
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <span id="theme-icon">🌙</span> Toggle Theme
+                </button>
             </div>
-
-            <div class="control-group">
-                <label for="symbols">Trading Symbols (comma separated):</label>
-                <input type="text" id="symbols" placeholder="BTCUSDT, ETHUSDT, BNBUSDT" value="BTCUSDT, ETHUSDT, BNBUSDT, SOLUSDT, XRPUSDT">
-            </div>
-
-            <div class="control-group">
-                <label for="startDate">Start Date (Friday 17:00 UTC):</label>
-                <input type="datetime-local" id="startDate">
-            </div>
-
-            <div class="control-group">
-                <label for="endDate">End Date (Monday 00:00 UTC):</label>
-                <input type="datetime-local" id="endDate">
-            </div>
-
-            <button onclick="calculateAll()">🚀 Calculate Fibonacci 50%</button>
         </div>
 
-        <div id="results"></div>
+        <!-- Progress Bar -->
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-text" id="progressText">Processing 0/0 coins...</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Pairs</div>
+                <div class="stat-value" id="totalPairs">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Within 5%</div>
+                <div class="stat-value" id="within5Percent">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg Distance</div>
+                <div class="stat-value" id="avgDistance">0%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Closest Pair</div>
+                <div class="stat-value" id="closestPair">-</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="control-group">
+                <label>🔍 Search Symbol</label>
+                <input type="text" id="searchInput" placeholder="Enter coin symbol (e.g., BTC, ETH, SOL...)" onkeyup="filterTable()">
+            </div>
+
+            <div class="control-group">
+                <label>📊 Distance Filters</label>
+                <div class="filter-buttons">
+                    <button class="filter-btn" onclick="setFilter('0-0.5')" data-range="0-0.5">0-0.5%</button>
+                    <button class="filter-btn" onclick="setFilter('0.5-1')" data-range="0.5-1">0.5-1%</button>
+                    <button class="filter-btn" onclick="setFilter('1-2')" data-range="1-2">1-2%</button>
+                    <button class="filter-btn" onclick="setFilter('2-5')" data-range="2-5">2-5%</button>
+                    <button class="filter-btn" onclick="setFilter('5-10')" data-range="5-10">5-10%</button>
+                    <button class="filter-btn" onclick="setFilter('10-20')" data-range="10-20">10-20%</button>
+                    <button class="filter-btn active" onclick="setFilter('all')" data-range="all">All</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>💰 Min Volume (M USDT)</label>
+                <input type="number" id="minVolumeInput" placeholder="Enter minimum volume" value="1" onchange="filterTable()">
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="scanMarket()" id="scanBtn">
+                    <span>🚀</span> Scan Market
+                </button>
+                <button class="btn btn-secondary" onclick="exportToCSV()" id="exportBtn" disabled>
+                    <span>📥</span> Export CSV
+                </button>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage"></div>
+
+        <!-- Loading State -->
+        <div class="loading" id="loadingState">
+            <div class="spinner"></div>
+            <div class="loading-text">Initializing scanner...</div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container" id="tableContainer" style="display: none;">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="sortable" onclick="sortTable('symbol')">Symbol</th>
+                            <th class="sortable" onclick="sortTable('currentPrice')">Current Price</th>
+                            <th class="sortable" onclick="sortTable('fib50')">Fib50</th>
+                            <th class="sortable" onclick="sortTable('arWickHigh')">AR Wick High</th>
+                            <th class="sortable" onclick="sortTable('arWickLow')">AR Wick Low</th>
+                            <th class="sortable" onclick="sortTable('distance')">Distance (%)</th>
+                            <th class="sortable" onclick="sortTable('volume')">Volume (M)</th>
+                            <th>Chart</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState">
+            <div class="empty-state-icon">📊</div>
+            <h3>No Results Found</h3>
+            <p>Try adjusting your filters or run a new scan</p>
+        </div>
+
+        <!-- Debug Panel -->
+        <div class="debug-panel">
+            <h3>🔧 Debug Information</h3>
+            <div class="debug-content" id="debugInfo">Click "Scan Market" to see debug information...</div>
+        </div>
     </div>
 
     <script>
-        // Set default dates (last Friday 17:00 to Monday 00:00)
-        function setDefaultDates() {
+        // Global variables
+        let allResults = [];
+        let currentFilter = 'all';
+        let sortColumn = 'distance';
+        let sortDirection = 'asc';
+
+        // Theme Management
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', newTheme);
+            document.getElementById('theme-icon').textContent = newTheme === 'dark' ? '🌙' : '☀️';
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.setAttribute('data-theme', savedTheme);
+            document.getElementById('theme-icon').textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+        });
+
+        // Binance API Functions
+        async function fetchBinanceData(url, retries = 3) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    if (i === retries - 1) throw error;
+                    await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+                }
+            }
+        }
+
+        // Get Asian Session Time Range (Friday 19:00-23:59 NY time)
+        function getAsianSessionTimeRange() {
             const now = new Date();
-            const dayOfWeek = now.getUTCDay();
+            
+            // Convert to NY time (EST/EDT)
+            const nyTime = new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"}));
             
             // Find last Friday
-            let daysToFriday = (dayOfWeek + 2) % 7;
-            if (daysToFriday === 0) daysToFriday = 7;
+            const dayOfWeek = nyTime.getDay();
+            const daysToSubtract = dayOfWeek === 5 ? 0 : (dayOfWeek + 2) % 7;
+            const lastFriday = new Date(nyTime);
+            lastFriday.setDate(nyTime.getDate() - daysToSubtract);
             
-            const lastFriday = new Date(now);
-            lastFriday.setUTCDate(now.getUTCDate() - daysToFriday);
-            lastFriday.setUTCHours(17, 0, 0, 0);
+            // Set to 19:00 (7 PM) NY time
+            lastFriday.setHours(19, 0, 0, 0);
+            const startTime = lastFriday.getTime();
             
-            // Find following Monday
-            const nextMonday = new Date(lastFriday);
-            nextMonday.setUTCDate(lastFriday.getUTCDate() + 3);
-            nextMonday.setUTCHours(0, 0, 0, 0);
+            // Set to 23:59 (11:59 PM) NY time
+            const endFriday = new Date(lastFriday);
+            endFriday.setHours(23, 59, 59, 999);
+            const endTime = endFriday.getTime();
             
-            // Format for datetime-local input
-            document.getElementById('startDate').value = formatDateForInput(lastFriday);
-            document.getElementById('endDate').value = formatDateForInput(nextMonday);
+            return { startTime, endTime };
         }
 
-        function formatDateForInput(date) {
-            const year = date.getUTCFullYear();
-            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-            const day = String(date.getUTCDate()).padStart(2, '0');
-            const hours = String(date.getUTCHours()).padStart(2, '0');
-            const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        // CORRECTED: Calculate Asian Range and Fib50
+        function calculateAsianRangeFib50(klines) {
+            if (!klines || klines.length === 0) {
+                return { fib50: null, ar_wickHigh: null, ar_wickLow: null };
+            }
+
+            // Initialize with first candle's values
+            let ar_wickHigh = parseFloat(klines[0][2]); // First candle's high
+            let ar_wickLow = parseFloat(klines[0][3]);  // First candle's low
+
+            // Iterate through all candles and update incrementally
+            for (let i = 0; i < klines.length; i++) {
+                const high = parseFloat(klines[i][2]);
+                const low = parseFloat(klines[i][3]);
+                
+                // Update incrementally
+                ar_wickHigh = Math.max(high, ar_wickHigh);
+                ar_wickLow = Math.min(low, ar_wickLow);
+            }
+
+            // Calculate Fib50
+            const fib50 = (ar_wickHigh + ar_wickLow) / 2;
+
+            return { fib50, ar_wickHigh, ar_wickLow };
         }
 
-        async function calculateAsianRangeFib50(symbol, startTime, endTime) {
+        // Scan Market
+        async function scanMarket() {
+            const scanBtn = document.getElementById('scanBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const loadingState = document.getElementById('loadingState');
+            const tableContainer = document.getElementById('tableContainer');
+            const progressContainer = document.getElementById('progressContainer');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Reset UI
+            scanBtn.disabled = true;
+            exportBtn.disabled = true;
+            loadingState.classList.add('active');
+            tableContainer.style.display = 'none';
+            progressContainer.classList.remove('active');
+            errorMessage.classList.remove('active');
+            allResults = [];
+
             try {
-                const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=15m&startTime=${startTime}&endTime=${endTime}&limit=1000`;
+                // Get Asian session time range
+                const { startTime, endTime } = getAsianSessionTimeRange();
                 
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                // Debug info
+                let debugText = `Asian Session Time Range:\n`;
+                debugText += `Start: ${new Date(startTime).toLocaleString('en-US', {timeZone: 'America/New_York'})} NY\n`;
+                debugText += `End: ${new Date(endTime).toLocaleString('en-US', {timeZone: 'America/New_York'})} NY\n`;
+                debugText += `Duration: ${((endTime - startTime) / (1000 * 60 * 60)).toFixed(2)} hours\n\n`;
+
+                // Fetch all USDT pairs
+                const exchangeInfo = await fetchBinanceData('https://api.binance.com/api/v3/exchangeInfo');
+                const usdtPairs = exchangeInfo.symbols
+                    .filter(s => s.symbol.endsWith('USDT') && s.status === 'TRADING')
+                    .map(s => s.symbol);
+
+                debugText += `Total USDT Pairs: ${usdtPairs.length}\n\n`;
+
+                // Show progress
+                progressContainer.classList.add('active');
+                loadingState.classList.remove('active');
+
+                const results = [];
+                let processed = 0;
+
+                // Process in batches
+                for (const symbol of usdtPairs) {
+                    try {
+                        // Get current price
+                        const ticker = await fetchBinanceData(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
+                        const currentPrice = parseFloat(ticker.lastPrice);
+                        const volume = parseFloat(ticker.quoteVolume) / 1000000; // Convert to millions
+
+                        // Get klines for Asian session
+                        const klinesUrl = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=15m&startTime=${startTime}&endTime=${endTime}&limit=1000`;
+                        const klines = await fetchBinanceData(klinesUrl);
+
+                        if (klines && klines.length > 0) {
+                            // Calculate Asian Range Fib50
+                            const { fib50, ar_wickHigh, ar_wickLow } = calculateAsianRangeFib50(klines);
+
+                            if (fib50) {
+                                const distance = Math.abs(((currentPrice - fib50) / fib50) * 100);
+
+                                results.push({
+                                    symbol,
+                                    currentPrice,
+                                    fib50,
+                                    arWickHigh: ar_wickHigh,
+                                    arWickLow: ar_wickLow,
+                                    distance,
+                                    volume,
+                                    klineCount: klines.length
+                                });
+
+                                // Add BTC analysis to debug
+                                if (symbol === 'BTCUSDT') {
+                                    debugText += `BTC Analysis:\n`;
+                                    debugText += `Current Price: $${currentPrice.toFixed(2)}\n`;
+                                    debugText += `AR Wick High: $${ar_wickHigh.toFixed(2)}\n`;
+                                    debugText += `AR Wick Low: $${ar_wickLow.toFixed(2)}\n`;
+                                    debugText += `Fib50: $${fib50.toFixed(2)}\n`;
+                                    debugText += `Distance: ${distance.toFixed(2)}%\n`;
+                                    debugText += `Candles: ${klines.length}\n`;
+                                }
+                            }
+                        }
+
+                        // Update progress
+                        processed++;
+                        const percentage = Math.round((processed / usdtPairs.length) * 100);
+                        document.getElementById('progressText').textContent = `Processing ${processed}/${usdtPairs.length} coins...`;
+                        document.getElementById('progressFill').style.width = `${percentage}%`;
+                        document.getElementById('progressFill').textContent = `${percentage}%`;
+
+                        // Rate limiting
+                        await new Promise(resolve => setTimeout(resolve, 150));
+
+                    } catch (error) {
+                        console.error(`Error processing ${symbol}:`, error);
+                    }
                 }
+
+                allResults = results;
                 
-                const klines = await response.json();
-                
-                if (!klines || klines.length === 0) {
-                    throw new Error('No data returned from API');
-                }
+                // Update debug info
+                document.getElementById('debugInfo').textContent = debugText;
 
-                // CORRECT PINE SCRIPT LOGIC:
-                // Initialize with FIRST candle's high/low
-                let ar_wickHigh = parseFloat(klines[0][2]); // First candle high
-                let ar_wickLow = parseFloat(klines[0][3]);  // First candle low
+                // Update statistics
+                updateStatistics();
 
-                // Update with each subsequent candle
-                for (let i = 1; i < klines.length; i++) {
-                    const high = parseFloat(klines[i][2]);
-                    const low = parseFloat(klines[i][3]);
-                    
-                    // Only update if current value is higher/lower
-                    ar_wickHigh = Math.max(high, ar_wickHigh);
-                    ar_wickLow = Math.min(low, ar_wickLow);
-                }
+                // Display results
+                displayResults();
 
-                // Calculate Fibonacci 50% (remains constant until next Friday)
-                const fib50 = (ar_wickHigh + ar_wickLow) / 2;
+                // Hide progress, show table
+                progressContainer.classList.remove('active');
+                tableContainer.style.display = 'block';
+                exportBtn.disabled = false;
 
-                return {
-                    fib50,
-                    wickHigh: ar_wickHigh,
-                    wickLow: ar_wickLow,
-                    candleCount: klines.length,
-                    rangeSize: ar_wickHigh - ar_wickLow
-                };
             } catch (error) {
-                console.error(`Error calculating Fib50 for ${symbol}:`, error);
-                throw error;
+                console.error('Scan error:', error);
+                errorMessage.textContent = `Error: ${error.message}. Please try again.`;
+                errorMessage.classList.add('active');
+                progressContainer.classList.remove('active');
+            } finally {
+                scanBtn.disabled = false;
+                loadingState.classList.remove('active');
             }
         }
 
-        async function calculateAll() {
-            const symbolsInput = document.getElementById('symbols').value;
-            const startDate = new Date(document.getElementById('startDate').value);
-            const endDate = new Date(document.getElementById('endDate').value);
-            
-            const symbols = symbolsInput.split(',').map(s => s.trim().toUpperCase());
-            
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '<div class="loading">⏳ Calculating...</div>';
-            
-            const startTime = startDate.getTime();
-            const endTime = endDate.getTime();
-            
-            try {
-                const results = await Promise.all(
-                    symbols.map(symbol => calculateAsianRangeFib50(symbol, startTime, endTime))
-                );
-                
-                displayResults(symbols, results);
-            } catch (error) {
-                resultsDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
-            }
+        // Update Statistics
+        function updateStatistics() {
+            const totalPairs = allResults.length;
+            const within5Percent = allResults.filter(r => r.distance <= 5).length;
+            const avgDistance = totalPairs > 0 
+                ? (allResults.reduce((sum, r) => sum + r.distance, 0) / totalPairs).toFixed(2)
+                : 0;
+            const closest = allResults.length > 0 
+                ? allResults.reduce((min, r) => r.distance < min.distance ? r : min, allResults[0])
+                : null;
+
+            document.getElementById('totalPairs').textContent = totalPairs;
+            document.getElementById('within5Percent').textContent = within5Percent;
+            document.getElementById('avgDistance').textContent = `${avgDistance}%`;
+            document.getElementById('closestPair').textContent = closest 
+                ? `${closest.symbol.replace('USDT', '')} (${closest.distance.toFixed(2)}%)`
+                : '-';
         }
 
-        function displayResults(symbols, results) {
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '';
+        // Filter Table
+        function filterTable() {
+            displayResults();
+        }
+
+        // Set Filter
+        function setFilter(range) {
+            currentFilter = range;
             
-            symbols.forEach((symbol, index) => {
-                const result = results[index];
-                const card = document.createElement('div');
-                card.className = 'result-card';
-                card.innerHTML = `
-                    <div class="symbol-name">${symbol}</div>
-                    <div class="fib-value">$${result.fib50.toFixed(2)}</div>
-                    <div class="detail-row">
-                        <span class="detail-label">High:</span>
-                        <span class="detail-value">$${result.wickHigh.toFixed(2)}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Low:</span>
-                        <span class="detail-value">$${result.wickLow.toFixed(2)}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Range:</span>
-                        <span class="detail-value">$${result.rangeSize.toFixed(2)}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Candles:</span>
-                        <span class="detail-value">${result.candleCount}</span>
-                    </div>
-                `;
-                resultsDiv.appendChild(card);
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-range') === range) {
+                    btn.classList.add('active');
+                }
             });
+            
+            displayResults();
         }
 
-        // Initialize with default dates
-        setDefaultDates();
+        // Display Results
+        function displayResults() {
+            const searchTerm = document.getElementById('searchInput').value.toUpperCase();
+            const minVolume = parseFloat(document.getElementById('minVolumeInput').value) || 0;
+            
+            let filtered = allResults.filter(r => {
+                // Search filter
+                if (searchTerm && !r.symbol.includes(searchTerm)) return false;
+                
+                // Volume filter
+                if (r.volume < minVolume) return false;
+                
+                // Distance filter
+                if (currentFilter !== 'all') {
+                    const [min, max] = currentFilter.split('-').map(parseFloat);
+                    if (r.distance < min || r.distance > max) return false;
+                }
+                
+                return true;
+            });
+
+            // Sort
+            filtered.sort((a, b) => {
+                let aVal = a[sortColumn];
+                let bVal = b[sortColumn];
+                
+                if (sortColumn === 'symbol') {
+                    aVal = aVal.toString();
+                    bVal = bVal.toString();
+                }
+                
+                if (sortDirection === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+
+            // Display
+            const tbody = document.getElementById('resultsBody');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                document.getElementById('tableContainer').style.display = 'none';
+                emptyState.classList.add('active');
+                return;
+            }
+
+            emptyState.classList.remove('active');
+            document.getElementById('tableContainer').style.display = 'block';
+
+            tbody.innerHTML = filtered.map(r => {
+                const distanceClass = r.distance <= 2 ? 'distance-close' 
+                    : r.distance <= 5 ? 'distance-medium' 
+                    : 'distance-far';
+                
+                const baseSymbol = r.symbol.replace('USDT', '');
+                const tvLink = `https://www.tradingview.com/chart/?symbol=BINANCE:${r.symbol}`;
+
+                return `
+                    <tr>
+                        <td class="symbol-cell">${baseSymbol}</td>
+                        <td>$${r.currentPrice.toFixed(8)}</td>
+                        <td>$${r.fib50.toFixed(8)}</td>
+                        <td>$${r.arWickHigh.toFixed(8)}</td>
+                        <td>$${r.arWickLow.toFixed(8)}</td>
+                        <td><span class="distance-badge ${distanceClass}">${r.distance.toFixed(2)}%</span></td>
+                        <td>${r.volume.toFixed(2)}M</td>
+                        <td><a href="${tvLink}" target="_blank" class="chart-link">📈 View</a></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Sort Table
+        function sortTable(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+
+            // Update headers
+            document.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+
+            const header = event.target;
+            header.classList.add(sortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+
+            displayResults();
+        }
+
+        // Export to CSV
+        function exportToCSV() {
+            if (allResults.length === 0) return;
+
+            const headers = ['Symbol', 'Current Price', 'Fib50', 'AR Wick High', 'AR Wick Low', 'Distance (%)', 'Volume (M)'];
+            const rows = allResults.map(r => [
+                r.symbol.replace('USDT', ''),
+                r.currentPrice,
+                r.fib50,
+                r.arWickHigh,
+                r.arWickLow,
+                r.distance.toFixed(2),
+                r.volume.toFixed(2)
+            ]);
+
+            let csv = headers.join(',') + '\n';
+            csv += rows.map(row => row.join(','')).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `asian-range-fib50-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
     </script>
 </body>
 </html>
