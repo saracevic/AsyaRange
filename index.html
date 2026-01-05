@@ -3,56 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asya Range Scanner - Professional Trading Dashboard</title>
+    <title>Asian Range Fibonacci 50% Scanner</title>
     <style>
-        :root {
-            --dark-bg-primary: #131722;
-            --dark-bg-secondary: #1E222D;
-            --dark-bg-tertiary: #2A2E39;
-            --dark-text-primary: #D1D4DC;
-            --dark-text-secondary: #787B86;
-            --dark-border: #2A2E39;
-            --dark-accent: #2962FF;
-            --dark-accent-hover: #1E53E5;
-            
-            --light-bg-primary: #F8F9FA;
-            --light-bg-secondary: #FFFFFF;
-            --light-bg-tertiary: #E9ECEF;
-            --light-text-primary: #2A2E39;
-            --light-text-secondary: #6C757D;
-            --light-border: #DEE2E6;
-            --light-accent: #2962FF;
-            --light-accent-hover: #1E53E5;
-            
-            --green: #26A69A;
-            --yellow: #FFB74D;
-            --orange: #FF9800;
-            --red: #EF5350;
-            --success: #4CAF50;
-            --warning: #FFC107;
-            --danger: #F44336;
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            transition: all 0.3s ease;
-            min-height: 100vh;
-        }
-
-        body.dark-mode {
-            background: linear-gradient(135deg, var(--dark-bg-primary) 0%, var(--dark-bg-secondary) 100%);
-            color: var(--dark-text-primary);
+        :root {
+            --bg-primary: #0f0f23;
+            --bg-secondary: #1a1a2e;
+            --bg-tertiary: #16213e;
+            --text-primary: #e4e4e7;
+            --text-secondary: #a1a1aa;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --border: #27272a;
         }
 
         body.light-mode {
-            background: linear-gradient(135deg, var(--light-bg-primary) 0%, var(--light-bg-tertiary) 100%);
-            color: var(--light-text-primary);
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --text-primary: #18181b;
+            --text-secondary: #52525b;
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
         }
 
         .container {
@@ -61,1162 +48,831 @@
             padding: 20px;
         }
 
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--dark-accent) 0%, #5E72E4 100%);
+        header {
+            background: var(--bg-secondary);
+            padding: 20px;
             border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-            box-shadow: 0 4px 15px rgba(41, 98, 255, 0.3);
-        }
-
-        .logo-text h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .logo-text p {
-            font-size: 14px;
-            opacity: 0.7;
-        }
-
-        .theme-toggle {
-            position: relative;
-            width: 60px;
-            height: 30px;
-            background: var(--dark-bg-tertiary);
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid var(--dark-border);
-        }
-
-        .light-mode .theme-toggle {
-            background: var(--light-bg-tertiary);
-            border-color: var(--light-border);
-        }
-
-        .theme-toggle-slider {
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 22px;
-            height: 22px;
-            background: var(--dark-accent);
-            border-radius: 50%;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-
-        .theme-toggle.active .theme-toggle-slider {
-            left: 32px;
-        }
-
-        /* Stats Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            padding: 25px;
-            border-radius: 16px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .dark-mode .stat-card {
-            background: rgba(30, 34, 45, 0.8);
-            border: 1px solid var(--dark-border);
-        }
-
-        .light-mode .stat-card {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid var(--light-border);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(41, 98, 255, 0.2);
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--dark-accent), #5E72E4);
-        }
-
-        .stat-label {
-            font-size: 14px;
-            opacity: 0.7;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--dark-accent);
-        }
-
-        .stat-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 40px;
-            opacity: 0.1;
-        }
-
-        /* Control Panel */
-        .control-panel {
-            padding: 25px;
-            border-radius: 16px;
-            margin-bottom: 30px;
-            backdrop-filter: blur(10px);
-        }
-
-        .dark-mode .control-panel {
-            background: rgba(30, 34, 45, 0.8);
-            border: 1px solid var(--dark-border);
-        }
-
-        .light-mode .control-panel {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid var(--light-border);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .control-group {
             margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .control-group:last-child {
-            margin-bottom: 0;
-        }
-
-        .control-label {
-            display: block;
+        h1 {
+            font-size: 28px;
             margin-bottom: 10px;
-            font-weight: 600;
+            background: linear-gradient(135deg, var(--accent), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
             font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
-        .filter-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
-        }
-
-        .filter-btn {
-            padding: 12px 20px;
-            border: 2px solid var(--dark-border);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            font-size: 13px;
-            text-align: center;
-        }
-
-        .dark-mode .filter-btn {
-            background: var(--dark-bg-tertiary);
-            color: var(--dark-text-primary);
-        }
-
-        .light-mode .filter-btn {
-            background: var(--light-bg-secondary);
-            color: var(--light-text-primary);
-            border-color: var(--light-border);
-        }
-
-        .filter-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(41, 98, 255, 0.2);
-        }
-
-        .filter-btn.active {
-            background: var(--dark-accent);
-            color: white;
-            border-color: var(--dark-accent);
-        }
-
-        .input-group {
+        .controls {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 20px;
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 12px;
         }
 
-        input[type="text"],
-        input[type="number"] {
-            flex: 1;
-            min-width: 200px;
-            padding: 12px 16px;
-            border: 2px solid var(--dark-border);
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .dark-mode input {
-            background: var(--dark-bg-tertiary);
-            color: var(--dark-text-primary);
-        }
-
-        .light-mode input {
-            background: var(--light-bg-secondary);
-            color: var(--light-text-primary);
-            border-color: var(--light-border);
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--dark-accent);
-            box-shadow: 0 0 0 3px rgba(41, 98, 255, 0.1);
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--dark-accent) 0%, #5E72E4 100%);
+        button {
+            background: var(--accent);
             color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .btn-primary:hover {
+        button:hover {
+            background: var(--accent-hover);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(41, 98, 255, 0.4);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
-        .btn-primary:disabled {
-            opacity: 0.5;
+        button:disabled {
+            background: var(--text-secondary);
             cursor: not-allowed;
             transform: none;
         }
 
-        .btn-secondary {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #45a049;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
-        }
-
-        /* Progress Bar */
-        .progress-container {
-            margin-bottom: 30px;
-        }
-
-        .progress-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
+        input, select {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 12px;
+            border-radius: 8px;
             font-size: 14px;
-            font-weight: 600;
+            transition: all 0.3s;
         }
 
-        .progress-bar-wrapper {
-            height: 8px;
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
-        .dark-mode .progress-bar-wrapper {
-            background: var(--dark-bg-tertiary);
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
-        .light-mode .progress-bar-wrapper {
-            background: var(--light-bg-tertiary);
+        .filter-group label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
         }
 
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--dark-accent), #5E72E4);
-            transition: width 0.3s ease;
-            border-radius: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .progress-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        /* Loading Spinner */
-        .loading-spinner {
+        #status {
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
             display: none;
-            text-align: center;
-            padding: 40px;
+            margin-bottom: 20px;
         }
 
-        .loading-spinner.active {
+        #status.show {
             display: block;
         }
 
-        .spinner {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 20px;
-            border: 4px solid transparent;
-            border-top-color: var(--dark-accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        #status.info {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(59, 130, 246, 0.3);
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        #status.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
-        .loading-text {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 10px;
+        #status.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
-        .loading-details {
-            font-size: 14px;
-            opacity: 0.7;
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
-        /* Table */
-        .table-container {
-            border-radius: 16px;
-            overflow: hidden;
-            margin-bottom: 30px;
-            backdrop-filter: blur(10px);
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
-        .dark-mode .table-container {
-            background: rgba(30, 34, 45, 0.8);
-            border: 1px solid var(--dark-border);
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
         }
 
-        .light-mode .table-container {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid var(--light-border);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         thead {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .dark-mode thead {
-            background: var(--dark-bg-secondary);
-        }
-
-        .light-mode thead {
-            background: var(--light-bg-tertiary);
+            background: var(--bg-tertiary);
         }
 
         th {
             padding: 16px;
             text-align: left;
-            font-weight: 700;
+            font-weight: 600;
             font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            color: var(--text-secondary);
             cursor: pointer;
             user-select: none;
-            transition: all 0.3s ease;
+            transition: background 0.3s;
         }
 
         th:hover {
-            background: rgba(41, 98, 255, 0.1);
+            background: var(--bg-primary);
         }
 
-        th::after {
+        th.sortable::after {
             content: ' ⇅';
             opacity: 0.3;
         }
 
-        th.sort-asc::after {
+        th.sorted-asc::after {
             content: ' ↑';
             opacity: 1;
         }
 
-        th.sort-desc::after {
+        th.sorted-desc::after {
             content: ' ↓';
             opacity: 1;
         }
 
         td {
             padding: 16px;
-            border-top: 1px solid var(--dark-border);
+            border-top: 1px solid var(--border);
             font-size: 14px;
         }
 
-        .light-mode td {
-            border-top-color: var(--light-border);
+        tr:hover {
+            background: var(--bg-tertiary);
         }
 
-        tbody tr {
-            transition: all 0.3s ease;
+        .symbol {
+            font-weight: 600;
+            color: var(--accent);
         }
 
-        tbody tr:hover {
-            background: rgba(41, 98, 255, 0.05);
-        }
-
-        .coin-symbol {
-            font-weight: 700;
-            font-size: 15px;
-        }
-
-        .price {
-            font-family: 'Courier New', monospace;
+        .distance {
             font-weight: 600;
         }
 
-        .distance-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 13px;
-            color: white;
+        .distance.close {
+            color: var(--success);
         }
 
-        .distance-ultra { background: var(--green); }
-        .distance-very { background: #66BB6A; }
-        .distance-precise { background: var(--yellow); color: #333; }
-        .distance-normal { background: var(--orange); }
-        .distance-wide { background: #FF7043; }
-        .distance-very-wide { background: var(--red); }
-
-        .chart-link {
-            display: inline-block;
-            padding: 6px 12px;
-            background: var(--dark-accent);
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.3s ease;
+        .distance.medium {
+            color: var(--warning);
         }
 
-        .chart-link:hover {
-            background: var(--dark-accent-hover);
-            transform: scale(1.05);
+        .distance.far {
+            color: var(--danger);
         }
 
-        .no-results {
-            text-align: center;
-            padding: 60px 20px;
-            font-size: 16px;
-            opacity: 0.7;
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
         }
 
-        /* Debug Panel */
+        .theme-toggle:hover {
+            background: var(--bg-primary);
+            transform: translateY(-2px);
+        }
+
         .debug-panel {
-            padding: 25px;
-            border-radius: 16px;
-            backdrop-filter: blur(10px);
-            margin-top: 30px;
-        }
-
-        .dark-mode .debug-panel {
-            background: rgba(30, 34, 45, 0.8);
-            border: 1px solid var(--dark-border);
-        }
-
-        .light-mode .debug-panel {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid var(--light-border);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 1px solid var(--border);
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
         }
 
         .debug-title {
-            font-size: 18px;
             font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--accent);
+            font-size: 14px;
+        }
+
+        .debug-section {
             margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
         }
 
-        .debug-content {
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            line-height: 1.8;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        .error-message {
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            border-left: 4px solid var(--danger);
-            background: rgba(244, 67, 54, 0.1);
-            color: var(--danger);
+        .debug-label {
+            color: var(--text-secondary);
             font-weight: 600;
         }
 
-        /* Responsive */
+        .chart-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .chart-link:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
+        }
+
+        .export-btn {
+            background: var(--success);
+        }
+
+        .export-btn:hover {
+            background: #059669;
+        }
+
         @media (max-width: 768px) {
             .container {
-                padding: 15px;
+                padding: 10px;
             }
 
-            .header {
+            .controls {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: stretch;
             }
 
-            .logo-text h1 {
-                font-size: 24px;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .filter-buttons {
-                grid-template-columns: 1fr;
-            }
-
-            .table-container {
-                overflow-x: auto;
+            button {
+                justify-content: center;
             }
 
             table {
-                min-width: 600px;
+                font-size: 12px;
             }
 
-            .input-group {
-                flex-direction: column;
-            }
-
-            input[type="text"],
-            input[type="number"] {
-                min-width: 100%;
+            th, td {
+                padding: 8px;
             }
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
         }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease;
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-
-        .dark-mode ::-webkit-scrollbar-track {
-            background: var(--dark-bg-secondary);
-        }
-
-        .light-mode ::-webkit-scrollbar-track {
-            background: var(--light-bg-tertiary);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--dark-accent);
-            border-radius: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--dark-accent-hover);
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="dark-mode">
+<body>
     <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="logo">
-                <div class="logo-icon">AR</div>
-                <div class="logo-text">
-                    <h1>Asya Range Scanner</h1>
-                    <p>Professional Trading Dashboard</p>
-                </div>
+        <header>
+            <h1>🎯 Asian Range Fibonacci 50% Scanner</h1>
+            <p class="subtitle">Real-time analysis of crypto pairs' distance from Asian Range Fib 50% level</p>
+        </header>
+
+        <div class="controls">
+            <button id="scanBtn" onclick="startScan()">
+                <span>🔍</span>
+                <span>Start Scan</span>
+            </button>
+            <button class="export-btn" onclick="exportToCSV()" id="exportBtn" disabled>
+                <span>📥</span>
+                <span>Export CSV</span>
+            </button>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span id="themeIcon">🌙</span>
+                <span>Toggle Theme</span>
+            </button>
+
+            <div class="filter-group">
+                <label for="searchInput">Search:</label>
+                <input type="text" id="searchInput" placeholder="Symbol..." oninput="filterResults()">
             </div>
-            <div class="theme-toggle" onclick="toggleTheme()">
-                <div class="theme-toggle-slider">🌙</div>
+
+            <div class="filter-group">
+                <label for="distanceFilter">Max Distance:</label>
+                <select id="distanceFilter" onchange="filterResults()">
+                    <option value="100">All</option>
+                    <option value="1">≤ 1%</option>
+                    <option value="2">≤ 2%</option>
+                    <option value="5" selected>≤ 5%</option>
+                    <option value="10">≤ 10%</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="minVolume">Min Volume (M):</label>
+                <input type="number" id="minVolume" value="0" min="0" step="1" onchange="filterResults()" style="width: 100px;">
             </div>
         </div>
 
-        <!-- Statistics Cards -->
-        <div class="stats-grid">
-            <div class="stat-card fade-in">
-                <div class="stat-label">Total Coins</div>
-                <div class="stat-value" id="totalCoins">0</div>
-                <div class="stat-icon">📊</div>
+        <div id="status"></div>
+
+        <div class="stats" id="stats" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-label">Total Pairs Scanned</div>
+                <div class="stat-value" id="totalPairs">0</div>
             </div>
-            <div class="stat-card fade-in" style="animation-delay: 0.1s;">
-                <div class="stat-label">Matched Coins</div>
-                <div class="stat-value" id="matchedCoins">0</div>
-                <div class="stat-icon">✓</div>
+            <div class="stat-card">
+                <div class="stat-label">Within 5%</div>
+                <div class="stat-value" id="within5">0</div>
             </div>
-            <div class="stat-card fade-in" style="animation-delay: 0.2s;">
-                <div class="stat-label">Last Scan</div>
-                <div class="stat-value" id="lastScan" style="font-size: 18px;">Never</div>
-                <div class="stat-icon">🕐</div>
+            <div class="stat-card">
+                <div class="stat-label">Avg Distance</div>
+                <div class="stat-value" id="avgDistance">0%</div>
             </div>
-            <div class="stat-card fade-in" style="animation-delay: 0.3s;">
-                <div class="stat-label">Scan Duration</div>
-                <div class="stat-value" id="scanDuration" style="font-size: 18px;">-</div>
-                <div class="stat-icon">⏱</div>
+            <div class="stat-card">
+                <div class="stat-label">Closest Pair</div>
+                <div class="stat-value" id="closestPair">-</div>
             </div>
         </div>
 
-        <!-- Control Panel -->
-        <div class="control-panel fade-in">
-            <div class="control-group">
-                <label class="control-label">🎯 Distance Range Filter</label>
-                <div class="filter-buttons">
-                    <div class="filter-btn" data-range="0-0.5">%0 - %0.5<br><small>Ultra Precise</small></div>
-                    <div class="filter-btn" data-range="0.5-1">%0.5 - %1<br><small>Very Precise</small></div>
-                    <div class="filter-btn" data-range="1-2">%1 - %2<br><small>Precise</small></div>
-                    <div class="filter-btn" data-range="2-5">%2 - %5<br><small>Normal</small></div>
-                    <div class="filter-btn" data-range="5-10">%5 - %10<br><small>Wide</small></div>
-                    <div class="filter-btn" data-range="10-20">%10 - %20<br><small>Very Wide</small></div>
-                    <div class="filter-btn active" data-range="all">All<br><small>No Filter</small></div>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <label class="control-label">🔍 Search & Scan</label>
-                <div class="input-group">
-                    <input type="text" id="searchInput" placeholder="Search coins (e.g., BTC, ETH, BNB)...">
-                    <input type="number" id="targetPercentage" placeholder="Target %" value="1.5" step="0.1" min="0">
-                    <button class="btn btn-primary" id="scanBtn" onclick="startScan()">Start Scan</button>
-                    <button class="btn btn-secondary" id="exportBtn" onclick="exportToCSV()" disabled>Export CSV</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Progress Bar -->
-        <div class="progress-container" id="progressContainer" style="display: none;">
-            <div class="progress-info">
-                <span id="progressText">Scanning...</span>
-                <span id="progressPercent">0%</span>
-            </div>
-            <div class="progress-bar-wrapper">
-                <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
-            </div>
-        </div>
-
-        <!-- Loading Spinner -->
-        <div class="loading-spinner" id="loadingSpinner">
-            <div class="spinner"></div>
-            <div class="loading-text">Scanning Markets...</div>
-            <div class="loading-details" id="loadingDetails">Initializing...</div>
-        </div>
-
-        <!-- Error Message -->
-        <div id="errorContainer"></div>
-
-        <!-- Results Table -->
-        <div class="table-container" id="tableContainer" style="display: none;">
-            <table>
+        <div style="overflow-x: auto;">
+            <table id="resultsTable" style="display: none;">
                 <thead>
                     <tr>
-                        <th onclick="sortTable(0)">Symbol</th>
-                        <th onclick="sortTable(1)">Current Price</th>
-                        <th onclick="sortTable(2)">24h High</th>
-                        <th onclick="sortTable(3)">24h Low</th>
-                        <th onclick="sortTable(4)">Distance (%)</th>
-                        <th onclick="sortTable(5)">Volume (24h)</th>
+                        <th class="sortable" onclick="sortTable(0)">Symbol</th>
+                        <th class="sortable" onclick="sortTable(1)">Current Price</th>
+                        <th class="sortable" onclick="sortTable(2)">Fib50</th>
+                        <th class="sortable" onclick="sortTable(3)">Wick High</th>
+                        <th class="sortable" onclick="sortTable(4)">Wick Low</th>
+                        <th class="sortable" onclick="sortTable(5)">Distance (%)</th>
+                        <th class="sortable" onclick="sortTable(6)">Volume (M)</th>
                         <th>Chart</th>
                     </tr>
                 </thead>
-                <tbody id="resultsBody">
-                </tbody>
+                <tbody id="resultsBody"></tbody>
             </table>
         </div>
 
-        <!-- Debug Panel -->
         <div class="debug-panel" id="debugPanel" style="display: none;">
-            <div class="debug-title">
-                <span>🔧 Debug Information</span>
-            </div>
-            <div class="debug-content" id="debugContent"></div>
+            <div class="debug-title">📊 Debug Information</div>
+            <div id="debugContent"></div>
         </div>
     </div>
 
     <script>
-        // Global variables
+        let scanResults = [];
         let allResults = [];
-        let currentFilter = 'all';
-        let currentSort = { column: -1, direction: 'asc' };
-        let scanStartTime = 0;
+        let sortColumn = 5;
+        let sortAscending = true;
 
-        // Theme Management
-        function toggleTheme() {
-            const body = document.body;
-            const toggle = document.querySelector('.theme-toggle');
-            const slider = document.querySelector('.theme-toggle-slider');
+        // Get last Friday's date
+        function getLastFriday() {
+            const now = new Date();
+            const dayOfWeek = now.getUTCDay();
+            const daysToSubtract = dayOfWeek >= 5 ? dayOfWeek - 5 : dayOfWeek + 2;
+            const lastFriday = new Date(now);
+            lastFriday.setUTCDate(now.getUTCDate() - daysToSubtract);
+            lastFriday.setUTCHours(0, 0, 0, 0);
+            return lastFriday;
+        }
+
+        // Get Asian session times (Friday 19:00-23:59 NY time = Friday 23:00 UTC to Saturday 03:59 UTC)
+        function getAsianSessionTimes() {
+            const lastFriday = getLastFriday();
             
-            if (body.classList.contains('dark-mode')) {
-                body.classList.remove('dark-mode');
-                body.classList.add('light-mode');
-                slider.textContent = '☀️';
-                localStorage.setItem('theme', 'light');
-            } else {
-                body.classList.remove('light-mode');
-                body.classList.add('dark-mode');
-                slider.textContent = '🌙';
-                localStorage.setItem('theme', 'dark');
-            }
-            toggle.classList.toggle('active');
-        }
-
-        // Load saved theme
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            if (savedTheme === 'light') {
-                toggleTheme();
-            }
-        });
-
-        // Filter buttons
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentFilter = this.dataset.range;
-                filterResults();
-            });
-        });
-
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('input', filterResults);
-
-        function filterResults() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            let filtered = allResults;
-
-            // Apply search filter
-            if (searchTerm) {
-                filtered = filtered.filter(item => 
-                    item.symbol.toLowerCase().includes(searchTerm)
-                );
-            }
-
-            // Apply range filter
-            if (currentFilter !== 'all') {
-                const [min, max] = currentFilter.split('-').map(Number);
-                filtered = filtered.filter(item => {
-                    const dist = item.distance;
-                    return dist >= min && dist <= max;
-                });
-            }
-
-            displayResults(filtered);
-            updateStats(filtered.length);
-        }
-
-        function updateStats(matchedCount) {
-            document.getElementById('totalCoins').textContent = allResults.length;
-            document.getElementById('matchedCoins').textContent = matchedCount;
-        }
-
-        function displayResults(results) {
-            const tbody = document.getElementById('resultsBody');
+            // Start: Friday 23:00 UTC (19:00 NY time)
+            const startTime = new Date(lastFriday);
+            startTime.setUTCHours(23, 0, 0, 0);
             
-            if (results.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="no-results">No coins found matching your criteria</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = results.map(item => `
-                <tr>
-                    <td class="coin-symbol">${item.symbol}</td>
-                    <td class="price">$${item.price}</td>
-                    <td class="price">$${item.high}</td>
-                    <td class="price">$${item.low}</td>
-                    <td><span class="distance-badge ${getDistanceClass(item.distance)}">${item.distance.toFixed(2)}%</span></td>
-                    <td class="price">$${formatVolume(item.volume)}</td>
-                    <td><a href="https://www.tradingview.com/chart/?symbol=BINANCE:${item.symbol}" target="_blank" class="chart-link">📈 View</a></td>
-                </tr>
-            `).join('');
+            // End: Saturday 03:59 UTC (23:59 NY time Friday)
+            const endTime = new Date(lastFriday);
+            endTime.setUTCDate(lastFriday.getUTCDate() + 1);
+            endTime.setUTCHours(3, 59, 59, 999);
+            
+            return {
+                startTime: startTime.getTime(),
+                endTime: endTime.getTime(),
+                startDate: startTime,
+                endDate: endTime
+            };
         }
 
-        function getDistanceClass(distance) {
-            if (distance <= 0.5) return 'distance-ultra';
-            if (distance <= 1) return 'distance-very';
-            if (distance <= 2) return 'distance-precise';
-            if (distance <= 5) return 'distance-normal';
-            if (distance <= 10) return 'distance-wide';
-            return 'distance-very-wide';
-        }
-
-        function formatVolume(volume) {
-            if (volume >= 1e9) return (volume / 1e9).toFixed(2) + 'B';
-            if (volume >= 1e6) return (volume / 1e6).toFixed(2) + 'M';
-            if (volume >= 1e3) return (volume / 1e3).toFixed(2) + 'K';
-            return volume.toFixed(2);
-        }
-
-        function sortTable(columnIndex) {
-            const headers = document.querySelectorAll('th');
-            
-            // Update sort direction
-            if (currentSort.column === columnIndex) {
-                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSort.column = columnIndex;
-                currentSort.direction = 'asc';
-            }
-
-            // Update header classes
-            headers.forEach((h, i) => {
-                h.classList.remove('sort-asc', 'sort-desc');
-                if (i === columnIndex) {
-                    h.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
-                }
-            });
-
-            // Sort data
-            const sortMultiplier = currentSort.direction === 'asc' ? 1 : -1;
-            
-            allResults.sort((a, b) => {
-                let valA, valB;
-                
-                switch(columnIndex) {
-                    case 0: // Symbol
-                        valA = a.symbol;
-                        valB = b.symbol;
-                        return valA.localeCompare(valB) * sortMultiplier;
-                    case 1: // Current Price
-                        valA = parseFloat(a.price);
-                        valB = parseFloat(b.price);
-                        break;
-                    case 2: // High
-                        valA = parseFloat(a.high);
-                        valB = parseFloat(b.high);
-                        break;
-                    case 3: // Low
-                        valA = parseFloat(a.low);
-                        valB = parseFloat(b.low);
-                        break;
-                    case 4: // Distance
-                        valA = a.distance;
-                        valB = b.distance;
-                        break;
-                    case 5: // Volume
-                        valA = parseFloat(a.volume);
-                        valB = parseFloat(b.volume);
-                        break;
-                    default:
-                        return 0;
-                }
-                
-                return (valA - valB) * sortMultiplier;
-            });
-
-            filterResults();
-        }
-
-        function exportToCSV() {
-            const headers = ['Symbol', 'Current Price', '24h High', '24h Low', 'Distance (%)', 'Volume (24h)', 'TradingView Link'];
-            const rows = allResults.map(item => [
-                item.symbol,
-                item.price,
-                item.high,
-                item.low,
-                item.distance.toFixed(2),
-                item.volume,
-                `https://www.tradingview.com/chart/?symbol=BINANCE:${item.symbol}`
-            ]);
-
-            let csv = headers.join(',') + '\n';
-            rows.forEach(row => {
-                csv += row.join(',') + '\n';
-            });
-
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `asya-range-scan-${new Date().toISOString()}.csv`;
-            a.click();
-            window.URL.revokeObjectURL(url);
-        }
-
-        // Scanning logic with improved error handling and batch processing
-        async function startScan() {
-            scanStartTime = Date.now();
-            allResults = [];
-            currentFilter = 'all';
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            document.querySelector('[data-range="all"]').classList.add('active');
-            
-            const targetPercentage = parseFloat(document.getElementById('targetPercentage').value) || 1.5;
-            
-            // UI Updates
-            document.getElementById('scanBtn').disabled = true;
-            document.getElementById('exportBtn').disabled = true;
-            document.getElementById('loadingSpinner').classList.add('active');
-            document.getElementById('progressContainer').style.display = 'block';
-            document.getElementById('tableContainer').style.display = 'none';
-            document.getElementById('errorContainer').innerHTML = '';
-            document.getElementById('debugPanel').style.display = 'none';
-            
+        // Calculate Asian Range Fibonacci 50%
+        async function calculateAsianRangeFib50(symbol, startTime, endTime) {
             try {
-                // Step 1: Get all trading pairs
-                updateProgress('Fetching trading pairs...', 0);
-                const exchangeInfo = await fetchWithRetry('https://api.binance.com/api/v3/exchangeInfo');
+                const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=15m&startTime=${startTime}&endTime=${endTime}&limit=1000`;
+                
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const klines = await response.json();
+                
+                if (!klines || klines.length === 0) {
+                    throw new Error('No data returned from API');
+                }
+
+                // Calculate wick high and wick low from all candles
+                let wickHigh = -Infinity;
+                let wickLow = Infinity;
+
+                for (const candle of klines) {
+                    const high = parseFloat(candle[2]);
+                    const low = parseFloat(candle[3]);
+                    
+                    if (high > wickHigh) wickHigh = high;
+                    if (low < wickLow) wickLow = low;
+                }
+
+                // Calculate Fibonacci 50%
+                const fib50 = (wickHigh + wickLow) / 2;
+
+                return {
+                    fib50,
+                    wickHigh,
+                    wickLow,
+                    candleCount: klines.length
+                };
+            } catch (error) {
+                console.error(`Error calculating Fib50 for ${symbol}:`, error);
+                throw error;
+            }
+        }
+
+        // Delay function for batch processing
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function startScan() {
+            const scanBtn = document.getElementById('scanBtn');
+            const statusDiv = document.getElementById('status');
+            const statsDiv = document.getElementById('stats');
+            const tableDiv = document.getElementById('resultsTable');
+            const debugPanel = document.getElementById('debugPanel');
+            
+            scanBtn.disabled = true;
+            scanBtn.innerHTML = '<div class="loading-spinner"></div><span>Scanning...</span>';
+            statusDiv.className = 'show info';
+            statusDiv.textContent = 'Initializing scan...';
+            
+            allResults = [];
+            scanResults = [];
+
+            try {
+                // Get Asian session times
+                statusDiv.textContent = 'Calculating Asian session timeframe...';
+                const { startTime, endTime, startDate, endDate } = getAsianSessionTimes();
+                
+                // Fetch all USDT trading pairs
+                statusDiv.textContent = 'Fetching trading pairs...';
+                const exchangeInfoResponse = await fetch('https://api.binance.com/api/v3/exchangeInfo');
+                const exchangeInfo = await exchangeInfoResponse.json();
                 
                 const usdtPairs = exchangeInfo.symbols
                     .filter(s => s.symbol.endsWith('USDT') && s.status === 'TRADING')
                     .map(s => s.symbol);
+
+                statusDiv.textContent = `Found ${usdtPairs.length} USDT pairs. Starting analysis...`;
                 
-                updateProgress(`Found ${usdtPairs.length} USDT pairs`, 5);
-                
-                // Step 2: Get 24hr ticker data for all pairs (batch request)
-                updateProgress('Fetching market data...', 10);
-                const tickerData = await fetchWithRetry('https://api.binance.com/api/v3/ticker/24hr');
-                
-                const tickerMap = {};
-                tickerData.forEach(ticker => {
-                    tickerMap[ticker.symbol] = ticker;
-                });
-                
-                // Step 3: Process coins in batches
-                const batchSize = 50;
-                const totalBatches = Math.ceil(usdtPairs.length / batchSize);
+                // Fetch 24h ticker data for all pairs
+                const tickerResponse = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+                const tickerData = await tickerResponse.json();
+                const tickerMap = new Map(tickerData.map(t => [t.symbol, t]));
+
+                // Process pairs in batches
+                const batchSize = 10;
                 let processedCount = 0;
-                
-                for (let i = 0; i < usdtPairs.length; i += batchSize) {
-                    const batch = usdtPairs.slice(i, i + batchSize);
-                    const currentBatch = Math.floor(i / batchSize) + 1;
+                let successCount = 0;
+                let btcAnalysis = null;
+
+                for (let i = 0; i < usdtPairs.length; i++) {
+                    const symbol = usdtPairs[i];
                     
-                    updateProgress(`Processing batch ${currentBatch}/${totalBatches}`, 10 + (processedCount / usdtPairs.length * 85));
-                    
-                    // Process batch
-                    for (const symbol of batch) {
-                        try {
-                            const ticker = tickerMap[symbol];
-                            if (!ticker) continue;
-                            
-                            const currentPrice = parseFloat(ticker.lastPrice);
-                            const high = parseFloat(ticker.highPrice);
-                            const low = parseFloat(ticker.lowPrice);
-                            const volume = parseFloat(ticker.quoteVolume);
-                            
-                            if (high === 0 || low === 0 || currentPrice === 0) continue;
-                            
-                            // Calculate distance from high
-                            const distanceFromHigh = ((high - currentPrice) / high) * 100;
-                            
-                            // Calculate distance from low
-                            const distanceFromLow = ((currentPrice - low) / low) * 100;
-                            
-                            // Find closest distance
-                            const closestDistance = Math.min(distanceFromHigh, distanceFromLow);
-                            
-                            if (closestDistance <= 20) { // Only include coins within 20% range
-                                allResults.push({
-                                    symbol: symbol,
-                                    price: currentPrice.toFixed(8).replace(/\.?0+$/, ''),
-                                    high: high.toFixed(8).replace(/\.?0+$/, ''),
-                                    low: low.toFixed(8).replace(/\.?0+$/, ''),
-                                    distance: closestDistance,
-                                    volume: volume,
-                                    volumeRaw: volume
-                                });
-                            }
-                            
-                            processedCount++;
-                            
-                            if (processedCount % 10 === 0) {
-                                updateProgress(`Processed ${processedCount}/${usdtPairs.length} coins`, 10 + (processedCount / usdtPairs.length * 85));
-                            }
-                            
-                        } catch (error) {
-                            console.warn(`Error processing ${symbol}:`, error.message);
+                    try {
+                        statusDiv.textContent = `Processing ${i + 1}/${usdtPairs.length}: Fetching Asian Range for ${symbol}...`;
+                        
+                        // Calculate Fib50 for this symbol
+                        const fibData = await calculateAsianRangeFib50(symbol, startTime, endTime);
+                        
+                        // Get current price and volume
+                        const ticker = tickerMap.get(symbol);
+                        if (!ticker) continue;
+                        
+                        const currentPrice = parseFloat(ticker.lastPrice);
+                        const volume = parseFloat(ticker.quoteVolume) / 1000000; // Convert to millions
+                        
+                        // Calculate distance from Fib50
+                        const distance = Math.abs((currentPrice - fibData.fib50) / fibData.fib50 * 100);
+                        
+                        const result = {
+                            symbol,
+                            currentPrice,
+                            fib50: fibData.fib50,
+                            wickHigh: fibData.wickHigh,
+                            wickLow: fibData.wickLow,
+                            distance,
+                            volume,
+                            candleCount: fibData.candleCount
+                        };
+                        
+                        allResults.push(result);
+                        successCount++;
+                        
+                        // Store BTC analysis for debug panel
+                        if (symbol === 'BTCUSDT') {
+                            btcAnalysis = result;
                         }
+                        
+                        // Delay between requests (150ms)
+                        if ((i + 1) % batchSize === 0) {
+                            await delay(150);
+                        } else {
+                            await delay(150);
+                        }
+                        
+                    } catch (error) {
+                        console.error(`Error processing ${symbol}:`, error);
                     }
                     
-                    // Small delay between batches to avoid rate limits
-                    if (i + batchSize < usdtPairs.length) {
-                        await sleep(100);
-                    }
+                    processedCount++;
                 }
-                
+
                 // Sort by distance
                 allResults.sort((a, b) => a.distance - b.distance);
-                
-                updateProgress('Scan complete!', 100);
+                scanResults = [...allResults];
                 
                 // Display results
-                const scanDuration = ((Date.now() - scanStartTime) / 1000).toFixed(1);
-                document.getElementById('lastScan').textContent = new Date().toLocaleTimeString();
-                document.getElementById('scanDuration').textContent = scanDuration + 's';
+                displayResults();
+                updateStats();
+                updateDebugPanel(startDate, endDate, btcAnalysis);
                 
-                setTimeout(() => {
-                    document.getElementById('loadingSpinner').classList.remove('active');
-                    document.getElementById('progressContainer').style.display = 'none';
-                    document.getElementById('tableContainer').style.display = 'block';
-                    document.getElementById('exportBtn').disabled = false;
-                    
-                    filterResults();
-                    
-                    // Show debug info
-                    showDebugInfo(usdtPairs.length, allResults.length, scanDuration);
-                }, 500);
+                statusDiv.className = 'show success';
+                statusDiv.textContent = `Scan complete! Successfully analyzed ${successCount} out of ${processedCount} pairs.`;
+                
+                statsDiv.style.display = 'grid';
+                tableDiv.style.display = 'table';
+                debugPanel.style.display = 'block';
+                document.getElementById('exportBtn').disabled = false;
                 
             } catch (error) {
-                showError('Scan failed: ' + error.message);
-                document.getElementById('loadingSpinner').classList.remove('active');
-                document.getElementById('progressContainer').style.display = 'none';
+                statusDiv.className = 'show error';
+                statusDiv.textContent = `Error: ${error.message}`;
+                console.error('Scan error:', error);
             } finally {
-                document.getElementById('scanBtn').disabled = false;
+                scanBtn.disabled = false;
+                scanBtn.innerHTML = '<span>🔍</span><span>Start Scan</span>';
             }
         }
 
-        async function fetchWithRetry(url, retries = 3, delay = 1000) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url);
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    return await response.json();
-                } catch (error) {
-                    if (i === retries - 1) throw error;
-                    console.warn(`Attempt ${i + 1} failed, retrying in ${delay}ms...`);
-                    await sleep(delay);
-                    delay *= 2; // Exponential backoff
-                }
-            }
+        function displayResults() {
+            const tbody = document.getElementById('resultsBody');
+            tbody.innerHTML = '';
+            
+            scanResults.forEach(result => {
+                const row = tbody.insertRow();
+                
+                // Symbol
+                const symbolCell = row.insertCell();
+                symbolCell.innerHTML = `<span class="symbol">${result.symbol}</span>`;
+                
+                // Current Price
+                const priceCell = row.insertCell();
+                priceCell.textContent = formatPrice(result.currentPrice);
+                
+                // Fib50
+                const fib50Cell = row.insertCell();
+                fib50Cell.textContent = formatPrice(result.fib50);
+                
+                // Wick High
+                const wickHighCell = row.insertCell();
+                wickHighCell.textContent = formatPrice(result.wickHigh);
+                
+                // Wick Low
+                const wickLowCell = row.insertCell();
+                wickLowCell.textContent = formatPrice(result.wickLow);
+                
+                // Distance
+                const distanceCell = row.insertCell();
+                const distanceClass = result.distance <= 2 ? 'close' : result.distance <= 5 ? 'medium' : 'far';
+                distanceCell.innerHTML = `<span class="distance ${distanceClass}">${result.distance.toFixed(2)}%</span>`;
+                
+                // Volume
+                const volumeCell = row.insertCell();
+                volumeCell.textContent = result.volume.toFixed(2) + 'M';
+                
+                // Chart Link
+                const chartCell = row.insertCell();
+                chartCell.innerHTML = `<a href="https://www.tradingview.com/chart/?symbol=BINANCE:${result.symbol}" target="_blank" class="chart-link">View</a>`;
+            });
         }
 
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
+        function formatPrice(price) {
+            if (price >= 1000) return price.toFixed(2);
+            if (price >= 1) return price.toFixed(4);
+            if (price >= 0.01) return price.toFixed(6);
+            return price.toFixed(8);
         }
 
-        function updateProgress(text, percent) {
-            document.getElementById('progressText').textContent = text;
-            document.getElementById('progressPercent').textContent = Math.round(percent) + '%';
-            document.getElementById('progressBar').style.width = percent + '%';
-            document.getElementById('loadingDetails').textContent = text;
+        function updateStats() {
+            document.getElementById('totalPairs').textContent = allResults.length;
+            
+            const within5 = allResults.filter(r => r.distance <= 5).length;
+            document.getElementById('within5').textContent = within5;
+            
+            const avgDist = allResults.reduce((sum, r) => sum + r.distance, 0) / allResults.length;
+            document.getElementById('avgDistance').textContent = avgDist.toFixed(2) + '%';
+            
+            const closest = allResults[0];
+            document.getElementById('closestPair').textContent = closest ? 
+                `${closest.symbol} (${closest.distance.toFixed(2)}%)` : '-';
         }
 
-        function showError(message) {
-            const errorContainer = document.getElementById('errorContainer');
-            errorContainer.innerHTML = `<div class="error-message">❌ ${message}</div>`;
-        }
-
-        function showDebugInfo(totalPairs, matchedPairs, duration) {
-            const debugPanel = document.getElementById('debugPanel');
+        function updateDebugPanel(startDate, endDate, btcAnalysis) {
             const debugContent = document.getElementById('debugContent');
             
-            const info = `
-Scan Statistics:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Total USDT Pairs: ${totalPairs}
-Coins in Range (≤20%): ${matchedPairs}
-Success Rate: ${((matchedPairs / totalPairs) * 100).toFixed(2)}%
-Scan Duration: ${duration}s
-Average Time per Coin: ${(duration / totalPairs * 1000).toFixed(2)}ms
-
-Distance Distribution:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Ultra Precise (0-0.5%): ${allResults.filter(r => r.distance <= 0.5).length}
-Very Precise (0.5-1%): ${allResults.filter(r => r.distance > 0.5 && r.distance <= 1).length}
-Precise (1-2%): ${allResults.filter(r => r.distance > 1 && r.distance <= 2).length}
-Normal (2-5%): ${allResults.filter(r => r.distance > 2 && r.distance <= 5).length}
-Wide (5-10%): ${allResults.filter(r => r.distance > 5 && r.distance <= 10).length}
-Very Wide (10-20%): ${allResults.filter(r => r.distance > 10 && r.distance <= 20).length}
-
-API Information:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Endpoint: Binance Public API
-Rate Limit: Respected with batch processing
-Batch Size: 50 coins per batch
-Retry Logic: 3 attempts with exponential backoff
-            `.trim();
+            let html = '<div class="debug-section">';
+            html += '<div class="debug-label">Asian Session Timeframe:</div>';
+            html += `<div>Start: ${startDate.toUTCString()}</div>`;
+            html += `<div>End: ${endDate.toUTCString()}</div>`;
+            html += `<div>Duration: ${((endDate - startDate) / (1000 * 60 * 60)).toFixed(1)} hours</div>`;
+            html += '</div>';
             
-            debugContent.textContent = info;
-            debugPanel.style.display = 'block';
+            if (btcAnalysis) {
+                html += '<div class="debug-section">';
+                html += '<div class="debug-label">BTC Detailed Analysis:</div>';
+                html += `<div>Candle Count: ${btcAnalysis.candleCount}</div>`;
+                html += `<div>Wick High: ${formatPrice(btcAnalysis.wickHigh)}</div>`;
+                html += `<div>Wick Low: ${formatPrice(btcAnalysis.wickLow)}</div>`;
+                html += `<div>Fib 50%: ${formatPrice(btcAnalysis.fib50)}</div>`;
+                html += `<div>Current Price: ${formatPrice(btcAnalysis.currentPrice)}</div>`;
+                html += `<div>Distance: ${btcAnalysis.distance.toFixed(2)}%</div>`;
+                html += `<div>Range: ${formatPrice(btcAnalysis.wickHigh - btcAnalysis.wickLow)}</div>`;
+                html += '</div>';
+            }
+            
+            // Distribution statistics
+            const ranges = [
+                { label: '0-1%', max: 1 },
+                { label: '1-2%', max: 2 },
+                { label: '2-5%', max: 5 },
+                { label: '5-10%', max: 10 },
+                { label: '10-20%', max: 20 },
+                { label: '>20%', max: Infinity }
+            ];
+            
+            html += '<div class="debug-section">';
+            html += '<div class="debug-label">Distance Distribution:</div>';
+            
+            ranges.forEach((range, index) => {
+                const minDist = index === 0 ? 0 : ranges[index - 1].max;
+                const count = allResults.filter(r => r.distance > minDist && r.distance <= range.max).length;
+                const percentage = ((count / allResults.length) * 100).toFixed(1);
+                html += `<div>${range.label}: ${count} pairs (${percentage}%)</div>`;
+            });
+            
+            html += '</div>';
+            
+            debugContent.innerHTML = html;
         }
+
+        function filterResults() {
+            const searchTerm = document.getElementById('searchInput').value.toUpperCase();
+            const maxDistance = parseFloat(document.getElementById('distanceFilter').value);
+            const minVolume = parseFloat(document.getElementById('minVolume').value) || 0;
+            
+            scanResults = allResults.filter(result => {
+                const matchesSearch = result.symbol.includes(searchTerm);
+                const matchesDistance = result.distance <= maxDistance;
+                const matchesVolume = result.volume >= minVolume;
+                return matchesSearch && matchesDistance && matchesVolume;
+            });
+            
+            displayResults();
+        }
+
+        function sortTable(columnIndex) {
+            const headers = document.querySelectorAll('th');
+            headers.forEach(h => h.classList.remove('sorted-asc', 'sorted-desc'));
+            
+            if (sortColumn === columnIndex) {
+                sortAscending = !sortAscending;
+            } else {
+                sortColumn = columnIndex;
+                sortAscending = true;
+            }
+            
+            const header = headers[columnIndex];
+            header.classList.add(sortAscending ? 'sorted-asc' : 'sorted-desc');
+            
+            const sortKeys = ['symbol', 'currentPrice', 'fib50', 'wickHigh', 'wickLow', 'distance', 'volume'];
+            const key = sortKeys[columnIndex];
+            
+            scanResults.sort((a, b) => {
+                let aVal = a[key];
+                let bVal = b[key];
+                
+                if (typeof aVal === 'string') {
+                    return sortAscending ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+                }
+                
+                return sortAscending ? aVal - bVal : bVal - aVal;
+            });
+            
+            displayResults();
+        }
+
+        function exportToCSV() {
+            const headers = ['Symbol', 'Current Price', 'Fib50', 'Wick High', 'Wick Low', 'Distance (%)', 'Volume (M)'];
+            const rows = scanResults.map(r => [
+                r.symbol,
+                r.currentPrice,
+                r.fib50,
+                r.wickHigh,
+                r.wickLow,
+                r.distance.toFixed(2),
+                r.volume.toFixed(2)
+            ]);
+            
+            let csv = headers.join(',') + '\n';
+            rows.forEach(row => {
+                csv += row.join(',') + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `asian-range-fib50-scan-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const icon = document.getElementById('themeIcon');
+            icon.textContent = document.body.classList.contains('light-mode') ? '☀️' : '🌙';
+            
+            // Save preference
+            localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+        }
+
+        // Load saved theme
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                document.getElementById('themeIcon').textContent = '☀️';
+            }
+        });
+
+        // Sort by distance on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const headers = document.querySelectorAll('th');
+            headers[5].classList.add('sorted-asc');
+        });
     </script>
 </body>
 </html>
