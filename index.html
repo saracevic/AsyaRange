@@ -922,9 +922,11 @@
             }
             
             removeItem(key) {
-                localStorage.removeItem(key
-
-                                        }
+                localStorage.removeItem(key);
+                } catch (error) {
+                    console.error('Secure storage remove error:', error);
+                }
+             }
         }
 
         // Data Validator
