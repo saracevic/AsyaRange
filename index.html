@@ -896,20 +896,20 @@
             const premiumCoins = allData.filter(d => Math.abs(d.distance) <= 0.5);
             
             if (premiumCoins.length > 0) {
-                // Sadece yeni coinleri gönder (önceki taramada gönderilmemişleri)
-                const newCoins = premiumCoins.filter(coin => !lastSentCoins.has(coin.symbol));
-                
-                if (premiumCoins.length > 0) {
-                    await sendTelegramScanReport(premiumCoins);
-                }
-                    // Gönderilen coinleri kaydet
-                    newCoins.forEach(coin => lastSentCoins.add(coin.symbol));
-                } else {
-                    console.log('✅ Yeni coin yok, Telegram mesajı gönderilmedi');
-                }
-            } else {
-                // 0-0.5% aralığında coin kalmadıysa, listeyi temizle
-                lastSentCoins.clear();
+    // Sadece yeni coinleri gönder (önceki taramada gönderilmemişleri)
+    const newCoins = premiumCoins.filter(coin => !lastSentCoins.has(coin.symbol));
+    
+    if (newCoins.length > 0) {
+        await sendTelegramScanReport(newCoins);
+        // Gönderilen coinleri kaydet
+        newCoins.forEach(coin => lastSentCoins.add(coin.symbol));
+    } else {
+        console.log('✅ Yeni coin yok, Telegram mesajı gönderilmedi');
+    }
+} else {
+    // 0-0.5% aralığında coin kalmadıysa, listeyi temizle
+    lastSentCoins.clear();
+}
             }
             
             // Sonraki tarama zamanını ayarla
