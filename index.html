@@ -880,55 +880,55 @@
         }
 
         // Secure Storage
-        class SecureStorage {
-            constructor(key) {
-                this.key = key;
-            }
-            
-            encrypt(text) {
-                return btoa(text.split('').map((char, i) => 
-                    String.fromCharCode(char.charCodeAt(0) ^ this.key.charCodeAt(i % this.key.length))
-                ).join(''));
-            }
-            
-            decrypt(encrypted) {
-                try {
-                    const decoded = atob(encrypted);
-                    return decoded.split('').map((char, i) => 
-                        String.fromCharCode(char.charCodeAt(0) ^ this.key.charCodeAt(i % this.key.length))
-                    ).join('');
-                } catch {
-                    return null;
-                }
-            }
-            
-            setItem(key, value) {
-                try {
-                    localStorage.setItem(key, this.encrypt(JSON.stringify(value)));
-                } catch (error) {
-                    console.error('Secure storage set error:', error);
-                }
-            }
-            
-            getItem(key) {
-                try {
-                    const encrypted = localStorage.getItem(key);
-                    if (!encrypted) return null;
-                    const decrypted = this.decrypt(encrypted);
-                    return decrypted ? JSON.parse(decrypted) : null;
-                } catch {
-                    return null;
-                }
-            }
-            
-            removeItem(key) {
-                localStorage.removeItem(key);
-                } catch (error) {
-                    console.error('Secure storage remove error:', error);
-                }
-             }
+class SecureStorage {
+    constructor(key) {
+        this.key = key;
+    }
+    
+    encrypt(text) {
+        return btoa(text.split('').map((char, i) => 
+            String.fromCharCode(char.charCodeAt(0) ^ this.key.charCodeAt(i % this.key.length))
+        ).join(''));
+    }
+    
+    decrypt(encrypted) {
+        try {
+            const decoded = atob(encrypted);
+            return decoded.split('').map((char, i) => 
+                String.fromCharCode(char.charCodeAt(0) ^ this.key.charCodeAt(i % this.key.length))
+            ).join('');
+        } catch {
+            return null;
         }
-
+    }
+    
+    setItem(key, value) {
+        try {
+            localStorage.setItem(key, this.encrypt(JSON.stringify(value)));
+        } catch (error) {
+            console.error('Secure storage set error:', error);
+        }
+    }
+    
+    getItem(key) {
+        try {
+            const encrypted = localStorage.getItem(key);
+            if (!encrypted) return null;
+            const decrypted = this.decrypt(encrypted);
+            return decrypted ? JSON.parse(decrypted) : null;
+        } catch {
+            return null;
+        }
+    }
+    
+    removeItem(key) {
+        try {
+            localStorage.removeItem(key);
+        } catch (error) {
+            console.error('Secure storage remove error:', error);
+        }
+    }
+}
         // Data Validator
         class DataValidator {
             static validateCoinData(coin) {
