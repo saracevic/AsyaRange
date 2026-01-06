@@ -899,8 +899,9 @@
                 // Sadece yeni coinleri gönder (önceki taramada gönderilmemişleri)
                 const newCoins = premiumCoins.filter(coin => !lastSentCoins.has(coin.symbol));
                 
-                if (newCoins.length > 0) {
-                    await sendTelegramScanReport(newCoins);
+                if (premiumCoins.length > 0) {
+                    await sendTelegramScanReport(premiumCoins);
+                }
                     // Gönderilen coinleri kaydet
                     newCoins.forEach(coin => lastSentCoins.add(coin.symbol));
                 } else {
