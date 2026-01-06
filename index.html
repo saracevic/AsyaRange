@@ -895,7 +895,7 @@
             // 0-0.5% aralığındaki coinleri bul
             const premiumCoins = allData.filter(d => Math.abs(d.distance) <= 0.5);
             
-            if (premiumCoins.length > 0) {
+if (premiumCoins.length > 0) {
     // Sadece yeni coinleri gönder (önceki taramada gönderilmemişleri)
     const newCoins = premiumCoins.filter(coin => !lastSentCoins.has(coin.symbol));
     
@@ -910,7 +910,6 @@
     // 0-0.5% aralığında coin kalmadıysa, listeyi temizle
     lastSentCoins.clear();
 }
-            }
             
             // Sonraki tarama zamanını ayarla
             nextScanTime = Date.now() + AUTO_SCAN_INTERVAL;
